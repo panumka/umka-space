@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>UmkA на PANAMABATTLE</h1>
+
+  {% if videos and videos|length > 0 %}
+    <div class="video-grid" style="max-width:860px;margin:16px auto 0;justify-content:center;">
+      {% for v in videos %}
+        <a class="video-card" href="{{ v.url }}" target="_blank" rel="noopener">
+          <div class="thumb">
+            <img src="{{ v.thumb }}" alt="{{ v.title }} thumbnail" loading="lazy">
+          </div>
+          <div class="meta">
+            <h3 class="title">{{ v.title }}</h3>
+            <div class="date">{{ v.published_at }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="placeholder">Поки що нічого не знайдено за ключовими словами. Спробуй інші терміни.</div>
+  {% endif %}
+{% endblock %}

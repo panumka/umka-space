@@ -1,0 +1,47 @@
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+
+# ---------- Editors ----------
+.vscode/
+.idea/
+
+# ---------- Python / Build ----------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+build/
+dist/
+
+# ---------- Virtualenv ----------
+.venv/
+venv/
+env/
+ENV/
+
+# ---------- Flask / Instance / DB ----------
+instance/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+logs/
+
+# ---------- Tests / Coverage ----------
+.pytest_cache/
+.tox/
+.coverage*
+htmlcov/
+
+# ---------- Secrets / Config ----------
+.env
+.env.*
+*.pem
+*.key
+
+# ---------- App caches ----------
+.cache/
+.cache_panamabattle*.json

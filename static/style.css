@@ -1,0 +1,463 @@
+:root {
+    --bg: #0b0b0b;
+    --text: #f5f5f5;
+    --muted: #9aa0a6;
+    --border: #262626;
+    --card: #151515;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+  margin: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.site-header {
+  background: rgba(11,11,11,0.9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+}
+
+.logo {
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.main-nav { display: flex; gap: 16px; }
+
+.nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.nav-link:hover,
+.nav-link.active { color: var(--text); background: var(--card); }
+
+.content { padding: 32px 0; }
+
+/* Центрований герой-блок на головній */
+.hero{display:flex;flex-direction:column;align-items:center;gap:16px;margin:24px 0}
+
+.cover {
+  width: min(72vmin, 520px);
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: radial-gradient(120% 120% at 0% 100%, #111 0%, #0a0a0a 50%, #000 100%);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45) inset, 0 6px 30px rgba(0,0,0,.35);
+}
+.cover:focus{outline:2px solid #333; outline-offset:4px}
+.cover:hover .play-icon{transform:scale(1.03)}
+
+.play-icon { font-size: 64px; }
+
+.hint { color: var(--muted); text-align: center; }
+
+.modal { display: none; position: fixed; inset: 0; z-index: 1000; }
+.modal.show { display: block; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
+
+.modal-dialog {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  background: var(--card); padding: 18px; border-radius: 16px; border: 1px solid var(--border);
+  width: min(90vw, 540px);
+}
+
+.modal-content {
+    max-width: 700px; /* обмежена ширина модального вікна */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background-color: #121212;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.modal-content img {
+    width: 200px;        /* фіксований розмір обкладинки в модалці */
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.modal-links {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-links a {
+    color: #a78bfa;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.modal-links a:hover {
+    color: #c4b5fd;
+}
+
+.platforms { list-style: none; padding: 0; }
+.platforms a { display: block; color: var(--text); text-decoration: none; padding: 12px; border-radius: 12px; background: #121212; margin: 8px 0; }
+.platforms a:hover { background: #181818; }
+
+.site-footer { border-top: 1px solid var(--border); color: var(--muted); text-align: center; padding: 18px 0; }
+
+/* --- PANAMABATTLE grid (centered) --- */
+.video-grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(360px,720px));justify-content:center;align-items:start;margin:16px auto 0}
+.video-card{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;background:var(--card);text-decoration:none;color:var(--text);overflow:hidden;max-width:720px;width:100%;margin:0 auto}
+.video-card:hover{transform:translateY(-1px);transition:transform .15s ease}
+.video-card .thumb{aspect-ratio:16/9;background:#0f0f0f}
+.video-card img{width:100%;height:100%;object-fit:cover;display:block}
+.video-card .meta{padding:10px 12px}
+.video-card .title{font-size:14px;line-height:1.3;margin:0 0 6px}
+.video-card .date{font-size:12px;color:var(--muted)}
+
+/* Notion blog excerpt */
+.excerpt{font-size:14px;line-height:1.35;color:var(--muted);margin:6px 0 0}
+
+/* --- BLOG grid (cards with smaller images) --- */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:20px;
+  align-items:start;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  text-decoration:none;
+  color:var(--text);
+}
+.card:hover{transform:translateY(-1px);transition:transform .15s ease}
+.card .thumb{
+  display:block;
+  width:100%;
+  height:180px;        /* control preview height */
+  object-fit:cover;    /* fill without distortion, crop overflow */
+  border-radius:8px;
+  margin-bottom:10px;
+}
+.card .title{
+  font-size:16px;
+  line-height:1.3;
+  margin:0 0 4px;
+}
+.card .date{
+  font-size:12px;
+  color:var(--muted);
+  margin:0 0 6px;
+}
+.card .excerpt{
+  font-size:14px;
+  line-height:1.4;
+  color:var(--muted);
+}
+
+/* Slightly smaller thumbs on very small screens */
+@media (max-width:420px){
+  .card .thumb{height:150px;}
+}
+
+/* === Blog Post Modal tuning === */
+#post-modal-root .modal-body { padding: 0 20px 20px 20px; }
+#post-modal-root .modal-body figure { margin: 0 0 14px 0; }
+#post-modal-root .modal-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Зменшуємо верхню обкладинку та центруємо */
+#post-modal-root .modal-body figure.cover {
+  display: flex;
+  justify-content: center;
+}
+#post-modal-root .modal-body figure.cover img {
+  width: 88%;
+  max-width: 680px;
+}
+
+/* === Releases grid (home) === */
+.releases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;align-items:start}
+.release-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-decoration:none;color:var(--text);cursor:pointer}
+.release-card:hover{transform:translateY(-1px);transition:transform .15s ease}
+.release-card .cover{width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden;display:block;border:1px solid var(--border)}
+.release-card .cover img{width:100%;height:100%;object-fit:cover;display:block}
+.release-card .title{margin:10px 0 4px;font-weight:700}
+.release-card .date{font-size:12px;color:var(--muted)}
+
+/* === Stream Modal (UmkA Releases) — обкладинка зліва, посилання справа === */
+#stream-modal-root .modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#stream-modal-root .modal-dialog {
+  background: #111;
+  border-radius: 14px;
+  max-width: 800px;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+#stream-modal-root .modal-header {
+  padding: 0 0 8px;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#stream-modal-root .modal-body {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+  padding: 8px 0 0;
+}
+
+#stream-modal-root .modal-body img {
+  width: 200px !important;         /* same size as card */
+  max-width: 200px !important;
+  height: 200px !important;        /* square shape like card */
+  max-height: 200px !important;
+  object-fit: cover;
+  border-radius: 12px;
+  flex: 0 0 200px;
+}
+
+#stream-modal-root .platforms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+#stream-modal-root .platforms a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #1a1a1a;
+  border-radius: 10px;
+  border: 1px solid #333;
+  text-decoration: none;
+  color: #fff;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+#stream-modal-root .platforms a:hover {
+  background: #222;
+  border-color: #555;
+}
+
+#stream-modal-root .platforms .label {
+  font-weight: 600;
+}
+
+#stream-modal-root [data-close] {
+  background: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+#stream-modal-root .modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 700px) {
+  #stream-modal-root .modal-dialog {
+    flex-direction: column;
+    align-items: center;
+    max-width: 520px;
+  }
+
+  #stream-modal-root .modal-body {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  #stream-modal-root .modal-body img {
+    width: 200px;   /* не збільшувати на мобільному */
+    max-width: 200px;
+    height: auto;
+    margin: 0 auto 6px;
+    flex: 0 0 200px;
+  }
+}
+/* === UmkA Releases section (cards on home) === */
+.release-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+.release-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  overflow: hidden;
+  width: 260px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.release-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cover-wrap {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.cover-placeholder { font-size: 50px; opacity: .6; }
+
+/* Scope play icon to release cards so it doesn't affect the hero */
+.release-card .play-icon {
+  position: absolute;
+  font-size: 48px;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.release-card:hover .play-icon { opacity: .85; }
+
+.release-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin: 10px 0 4px;
+}
+
+.release-date {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+/* platform buttons */
+.release-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+.pill {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 6px 12px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.pill:hover { background: rgba(255, 255, 255, 0.15); }
+
+/* --- Streaming platform buttons on release cards --- */
+.stream-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: .5rem;
+  justify-content: center;
+}
+
+.btn-platform {
+  display: inline-block;
+  font-size: .85rem;
+  line-height: 1;
+  padding: .45rem .65rem;
+  border-radius: .55rem;
+  border: 1px solid var(--card-border, #3b3b3b);
+  text-decoration: none;
+  background: rgba(255,255,255,0.03);
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+
+.btn-platform:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.06);
+}
+
+/* кольори для різних платформ */
+.btn-platform.spotify { border-color: #1db95433; color: #bfeecf; }
+.btn-platform.apple { border-color: #ffffff33; }
+.btn-platform.youtubemusic { border-color: #ff003333; }
+.btn-platform.youtube { border-color: #ff000033; }
+.btn-platform.deezer { border-color: #00c7f233; }
+.btn-platform.soundcloud { border-color: #ff770033; }
+.btn-platform.bandcamp { border-color: #1da0a633; }
+
+/* щоб лінки не блокувались оверлеєм */
+.stream-card a { pointer-events: auto; }
+
+/* --- Guards against generic image modals scaling to full screen --- */
+.image-modal img, .modal-img-only img, .modal .img-only {
+  max-width: 90vw;
+  max-height: 85vh;
+}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>UmkA каже</h1>
+
+  {# Підказка, якщо не налаштовані ключі/база #}
+  {% if need_notion_keys %}
+    <p class="placeholder">
+      Щоб показати записи, додай <code>NOTION_API_KEY</code> і <code>NOTION_DATABASE_ID</code> у <code>.env</code>,
+      а також поділися базою з інтеграцією (Share → Invite → обери свою інтеграцію).
+    </p>
+  {% endif %}
+
+  {# Список постів з Notion #}
+  {% if posts and posts|length > 0 %}
+    <div class="cards">
+      {% for p in posts %}
+        <article class="card post-card" data-page-id="{{ p.id }}">
+          {% if p.thumb %}
+            <a href="#" class="post-open" data-id="{{ p.id }}">
+              <img src="/proxy_img?b={{ p.thumb | b64encode }}" alt="Превʼю: {{ p.title|e }}" class="thumb" loading="lazy" decoding="async" />
+            </a>
+          {% else %}
+            <a href="#" class="post-open thumb thumb--empty" data-id="{{ p.id }}" aria-label="Відкрити нотатку «{{ p.title|e }}»">
+              Без превʼю
+            </a>
+          {% endif %}
+
+          <h3 class="title">
+            <a class="title-link post-open" href="#" data-id="{{ p.id }}">{{ p.title }}</a>
+          </h3>
+
+          {% if p.date %}
+            <div class="meta">{{ p.date }}</div>
+          {% endif %}
+
+          {% if p.excerpt %}
+            <p class="excerpt">{{ p.excerpt }}</p>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="placeholder">Поки що нотаток немає.</p>
+  {% endif %}
+  <div id="post-modal-root"></div>
+{% endblock %}

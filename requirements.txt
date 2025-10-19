@@ -1,0 +1,8 @@
+Flask==3.1.2
+Flask-Caching==2.1.0
+requests==2.32.3
+python-dotenv==1.0.1
+notion-client==2.2.1
+Pillow==10.4.0
+pillow-heif==0.18.0
+gunicorn==23.0.0

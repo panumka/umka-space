@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="releases">
+  {% if need_streams_keys %}
+    <p class="hint">Додай NOTION_API_KEY та NOTION_STREAMS_DATABASE_ID до .env, щоб підвантажити релізи з Notion.</p>
+  {% elif releases|length == 0 %}
+    <p class="hint">Поки що тут порожньо. Додай реліз у таблицю Notion.</p>
+  {% else %}
+    <div class="release-grid">
+      {% for r in releases %}
+      <article class="release-card" role="button" tabindex="0"
+               aria-label="Відкрити майданчики для {{ r.title }}"
+               data-title="{{ r.title }}"
+               data-date="{{ r.date }}"
+               data-links='{{ r.links | tojson }}'
+               data-cover='{{ r.cover | replace("'", "&#39;") | replace("\n", " ") }}'
+               data-coverb64='{{ r.cover | b64encode }}'
+               data-id="{{ r.id }}"
+               data-page-id="{{ r.id }}">
+        <div class="cover-wrap">
+          {% if r.cover %}
+            <img src="/proxy_img?b={{ r.cover | b64encode }}" alt="{{ r.title }}" loading="lazy" decoding="async">
+          {% else %}
+            <div class="cover-placeholder">🎵</div>
+          {% endif %}
+          <div class="play-icon" aria-hidden="true">▶</div>
+        </div>
+        <h3 class="release-title">{{ r.title }}</h3>
+        {% if r.date %}<div class="release-date">{{ r.date }}</div>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+<!-- Контейнер для модалки стрімінгу; JS наповнює його динамічно -->
+<div id="stream-modal-root"></div>
+{% endblock %}
