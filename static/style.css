@@ -27,7 +27,7 @@ body {
 
 .header-inner {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   min-height: 56px;
   gap: 2rem; /* однакова відстань між лого та навігацією */
@@ -52,7 +52,7 @@ body {
   font-weight: 400;
   font-size: 0.9rem;
   line-height: 1;
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
 }
 
 .main-nav { display: flex; gap: 16px; align-items: flex-end; }
@@ -522,6 +522,7 @@ body {
   color: var(--muted);
   transition: color 0.2s ease, background 0.2s ease;
   min-width: 80px; /* щоб усі були на одному рівні */
+  padding-top: 0.25rem;
 }
 
 .main-nav.stacked .nav-link span:first-child {
