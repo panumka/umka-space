@@ -20,21 +20,14 @@
     <div class="container header-inner">
       <div class="brand">
         <!-- Лого потім; зараз просто назва згідно з вимогою: U та A великі -->
-        <a href="{{ url_for('index') }}" class="logo">UmkA</a>
+        <a href="{{ url_for('index') }}" class="logo">
+          <span class="logo-main">UmkA</span><br>
+          <span class="logo-sub">music</span>
+        </a>
       </div>
-      <nav class="main-nav stacked">
-        <a href="/" class="nav-link {% if active == 'home' %}active{% endif %}">
-          <span class="top">UmkA</span>
-          <span class="bottom">music</span>
-        </a>
-        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}">
-          <span class="top">UmkA</span>
-          <span class="bottom">PANAMABATTLE</span>
-        </a>
-        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}">
-          <span class="top">UmkA</span>
-          <span class="bottom">каже</span>
-        </a>
+      <nav class="main-nav">
+        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}">UmkA PANAMABATTLE</a>
+        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}">UmkA каже</a>
       </nav>
     </div>
   </header>
