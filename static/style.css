@@ -4,8 +4,6 @@
     --muted: #9aa0a6;
     --border: #262626;
     --card: #151515;
-    /* Єдина горизонтальна відстань між усіма пунктами хедера  */
-    --nav-gap: 28px;
 }
 
 body {
@@ -30,9 +28,9 @@ body {
 .header-inner {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* однакова відстань між усіма елементами, без додаткового розтягування */
+  justify-content: space-between;
   min-height: 56px;
-  gap: var(--nav-gap);
+  gap: 2rem; /* однакова відстань між лого та навігацією */
 }
 
 .logo {
@@ -46,7 +44,7 @@ body {
   display: block;
   font-weight: 800;
   font-size: 16px;
-  line-height: 1;
+  line-height: 1.05;
 }
 
 .logo-sub {
@@ -54,19 +52,15 @@ body {
   font-weight: 400;
   font-size: 13px;
   line-height: 1;
-  margin-top: -2px;               /* ближче до основного рядка */
+  margin-top: -6px;
 }
 
-.main-nav { 
-  display: flex; 
-  gap: var(--nav-gap);            /* така ж відстань як між логотипом і першим пунктом */
-  align-items: center;            /* вирівнюємо по центру по вертикалі */
-}
+.main-nav { display: flex; gap: 16px; align-items: flex-end; }
 
 .nav-link {
   color: var(--muted);
   text-decoration: none;
-  padding: 4px 0;                /* менший внутрішній відступ, щоб відстані рахувались через gap */
+  padding: 8px 10px;
   border-radius: 8px;
 }
 
@@ -488,22 +482,21 @@ body {
 @media (max-width: 640px) {
   .header-inner {
     min-height: 52px;
-    gap: var(--nav-gap);
-    flex-wrap: nowrap !important;
-    justify-content: flex-start;  /* однакова модель як на десктопі */
+    gap: 20px;                 /* більша базова відстань між логотипом і навігацією */
+    flex-wrap: nowrap !important; /* keep everything on one line */
   }
   .logo {
     font-size: 18px;           /* slightly smaller brand */
     letter-spacing: 0.1px;
   }
   .main-nav {
-    gap: var(--nav-gap);
+    gap: 20px;                 /* однакова відстань між пунктами меню */
     flex-wrap: nowrap !important;
-    margin-left: 0;               /* щоб відстань керувалась тільки gap */
+    margin-left: 20px;         /* така ж відстань від логотипа до першого пункту */
   }
   .nav-link {
-    padding: 4px 0;
-    font-size: 14px;
+    padding: 6px 8px;          /* smaller paddings */
+    font-size: 14px;           /* smaller font for nav */
     line-height: 1.1;
   }
   .container {                 /* a touch less horizontal padding */
