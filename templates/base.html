@@ -23,9 +23,18 @@
         <a href="{{ url_for('index') }}" class="logo">UmkA</a>
       </div>
       <nav class="main-nav stacked">
-        <a href="/" class="nav-link {% if active == 'home' %}active{% endif %}"><span>UmkA</span><span>music</span></a>
-        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}"><span>UmkA</span><span>PANAMABATTLE</span></a>
-        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}"><span>UmkA</span><span>каже</span></a>
+        <a href="/" class="nav-link {% if active == 'home' %}active{% endif %}">
+          <span class="top">UmkA</span>
+          <span class="bottom">music</span>
+        </a>
+        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}">
+          <span class="top">UmkA</span>
+          <span class="bottom">PANAMABATTLE</span>
+        </a>
+        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}">
+          <span class="top">UmkA</span>
+          <span class="bottom">каже</span>
+        </a>
       </nav>
     </div>
   </header>
