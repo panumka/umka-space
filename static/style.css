@@ -254,6 +254,10 @@ body {
   position: relative;                   /* keep above backdrop */
   z-index: 1;
   color: #e9e9e9;                       /* keep the brighter text */
+  left: auto;
+  top: auto;
+  transform: none;
+  margin: 0 auto; /* keep horizontally centered in the flex container */
 }
 
 #stream-modal-root .modal-header {
