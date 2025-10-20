@@ -516,22 +516,25 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   line-height: 1.2;
   text-decoration: none;
   color: var(--muted);
   transition: color 0.2s ease, background 0.2s ease;
+  min-width: 80px; /* щоб усі були на одному рівні */
 }
 
 .main-nav.stacked .nav-link span:first-child {
   font-weight: 700;
   font-size: 16px;
   color: var(--text);
+  line-height: 1.1;
 }
 
 .main-nav.stacked .nav-link span:last-child {
   font-size: 13px;
   color: var(--muted);
+  margin-top: 2px; /* трохи нижче, щоб вирівняти */
 }
 
 .main-nav.stacked .nav-link:hover span:last-child,
