@@ -188,6 +188,18 @@ document.addEventListener("click", async (e) => {
       if (streamRoot) {
         // try to find a cover <img>
         let coverImg = streamRoot.querySelector("img");
+        // set blurred backdrop image from cover
+        const backdropEl = root.querySelector('.modal-backdrop');
+        let coverUrl = null;
+        if (coverImg && coverImg.getAttribute('src')) {
+          coverUrl = coverImg.getAttribute('src');
+        } else {
+          const og = streamRoot.querySelector('meta[property="og:image"]');
+          if (og) coverUrl = og.getAttribute('content');
+        }
+        if (backdropEl && coverUrl) {
+          backdropEl.style.setProperty('--cover', `url("${coverUrl}")`);
+        }
         // try to find links container by common selectors or create one
         let linksBox = streamRoot.querySelector(".links, .platforms, .platform-links");
         if (!streamRoot.querySelector(".release-wrap")) {
