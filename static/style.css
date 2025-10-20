@@ -486,3 +486,29 @@ body {
     padding: 0 12px;
   }
 }
+/* === stacked nav links (UmkA / music / PANAMABATTLE / каже) === */
+.main-nav.stacked .nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+  padding: 4px 8px;
+}
+
+.main-nav.stacked .nav-link span:first-child {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.main-nav.stacked .nav-link span:last-child {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ensure equal spacing between links */
+.main-nav.stacked {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+}

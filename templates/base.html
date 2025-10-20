@@ -22,13 +22,10 @@
         <!-- Лого потім; зараз просто назва згідно з вимогою: U та A великі -->
         <a href="{{ url_for('index') }}" class="logo">UmkA</a>
       </div>
-      <nav class="main-nav">
-        <a class="nav-link {% if request.path == url_for('panamabattle') %}active{% endif %}" href="{{ url_for('panamabattle') }}">
-          UmkA на PANAMABATTLE
-        </a>
-        <a class="nav-link {% if request.path == url_for('blog') %}active{% endif %}" href="{{ url_for('blog') }}">
-          UmkA каже
-        </a>
+      <nav class="main-nav stacked">
+        <a href="/" class="nav-link {% if active == 'home' %}active{% endif %}"><span>UmkA</span><span>music</span></a>
+        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}"><span>UmkA</span><span>PANAMABATTLE</span></a>
+        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}"><span>UmkA</span><span>каже</span></a>
       </nav>
     </div>
   </header>
