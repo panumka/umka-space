@@ -27,9 +27,10 @@ body {
 
 .header-inner {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   min-height: 56px;
+  gap: 2rem; /* однакова відстань між лого та навігацією */
 }
 
 .logo {
@@ -39,7 +40,22 @@ body {
   text-decoration: none;
 }
 
-.main-nav { display: flex; gap: 16px; }
+.logo-main {
+  display: block;
+  font-weight: 800;
+  font-size: 1.4rem;
+  line-height: 1.1;
+}
+
+.logo-sub {
+  display: block;
+  font-weight: 400;
+  font-size: 0.9rem;
+  line-height: 1;
+  margin-top: 0.2rem;
+}
+
+.main-nav { display: flex; gap: 16px; align-items: flex-end; }
 
 .nav-link {
   color: var(--muted);
