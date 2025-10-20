@@ -486,19 +486,30 @@ body {
     padding: 0 12px;
   }
 }
-/* === stacked nav links (UmkA / music / PANAMABATTLE / каже) === */
+/* === stacked nav links with equal spacing === */
+.main-nav.stacked {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px; /* рівна відстань між UmkA/music/PANAMABATTLE/каже */
+  flex-wrap: nowrap;
+}
+
 .main-nav.stacked .nav-link {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  line-height: 1.1;
-  padding: 4px 8px;
+  line-height: 1.2;
+  text-decoration: none;
+  color: var(--muted);
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .main-nav.stacked .nav-link span:first-child {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
+  color: var(--text);
 }
 
 .main-nav.stacked .nav-link span:last-child {
@@ -506,9 +517,20 @@ body {
   color: var(--muted);
 }
 
-/* ensure equal spacing between links */
-.main-nav.stacked {
-  display: flex;
-  justify-content: space-around;
-  gap: 20px;
+.main-nav.stacked .nav-link:hover span:last-child,
+.main-nav.stacked .nav-link.active span:last-child {
+  color: var(--text);
+}
+
+/* адаптивність — вирівнювання при малих екранах */
+@media (max-width: 600px) {
+  .main-nav.stacked {
+    gap: 20px;
+  }
+  .main-nav.stacked .nav-link span:first-child {
+    font-size: 15px;
+  }
+  .main-nav.stacked .nav-link span:last-child {
+    font-size: 12px;
+  }
 }
