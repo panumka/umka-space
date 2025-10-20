@@ -27,7 +27,7 @@ body {
 
 .header-inner {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   min-height: 56px;
   gap: 2rem; /* однакова відстань між лого та навігацією */
@@ -45,6 +45,7 @@ body {
   font-weight: 800;
   font-size: 16px;
   line-height: 1.1;
+  margin-top: 2px;
 }
 
 .logo-sub {
@@ -52,7 +53,7 @@ body {
   font-weight: 400;
   font-size: 13px;
   line-height: 1;
-  margin-top: -2px;
+  margin-top: -4px;
 }
 
 .main-nav { display: flex; gap: 16px; align-items: flex-end; }
@@ -502,6 +503,8 @@ body {
   .container {                 /* a touch less horizontal padding */
     padding: 0 12px;
   }
+  .logo-main { margin-top: 3px; }
+  .logo-sub  { margin-top: -6px; }
 }
 /* === stacked nav links with equal spacing === */
 .main-nav.stacked {
