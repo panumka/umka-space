@@ -234,21 +234,26 @@ body {
   inset: 0;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center;       /* vertical center */
+  justify-content: center;   /* horizontal center */
+  min-height: 100vh;         /* ensure full viewport height */
+  padding: 16px;             /* small safe-area padding */
   z-index: 1000;
 }
 
 #stream-modal-root .modal-dialog {
   background: #111;
   border-radius: 14px;
-  max-width: 800px;
-  width: 90%;
+  max-width: 680px;                     /* was 800px */
+  width: clamp(320px, 92vw, 680px);     /* responsive width */
   display: flex;
   flex-direction: row;
-  gap: 24px;
-  padding: 24px;
+  gap: 20px;
+  padding: 20px;                        /* a touch tighter */
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  position: relative;                   /* keep above backdrop */
+  z-index: 1;
+  color: #e9e9e9;                       /* keep the brighter text */
 }
 
 #stream-modal-root .modal-header {
@@ -374,16 +379,20 @@ body {
     flex-direction: column;
     align-items: center;
     max-width: 520px;
+    width: 92%;
+    padding: 16px;
+    gap: 14px;
   }
 
   #stream-modal-root .modal-body {
     flex-direction: column;
     align-items: center;
     gap: 14px;
+    width: 100%;
   }
 
   #stream-modal-root .modal-body img {
-    width: 200px;   /* не збільшувати на мобільному */
+    width: 200px;   /* do not upscale on mobile */
     max-width: 200px;
     height: auto;
     margin: 0 auto 6px;
