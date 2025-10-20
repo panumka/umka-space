@@ -461,3 +461,28 @@ body {
   max-width: 90vw;
   max-height: 85vh;
 }
+
+/* === Compact header on small screens (single-line, no wrap) === */
+@media (max-width: 640px) {
+  .header-inner {
+    min-height: 52px;
+    gap: 8px;
+    flex-wrap: nowrap !important; /* keep everything on one line */
+  }
+  .logo {
+    font-size: 18px;           /* slightly smaller brand */
+    letter-spacing: 0.1px;
+  }
+  .main-nav {
+    gap: 10px;                 /* tighter spacing between items */
+    flex-wrap: nowrap !important;
+  }
+  .nav-link {
+    padding: 6px 8px;          /* smaller paddings */
+    font-size: 14px;           /* smaller font for nav */
+    line-height: 1.1;
+  }
+  .container {                 /* a touch less horizontal padding */
+    padding: 0 12px;
+  }
+}

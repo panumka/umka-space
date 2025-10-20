@@ -47,7 +47,7 @@ def get_terms():
     if raw:
         return [t.strip().lower() for t in raw.split(",") if t.strip()]
     # default terms (case-insensitive substring check)
-    return ["umka", "umk", "нішеві"]
+    return ["umka", "umk", "нішеві", "fremd"]
 
 
 def fetch_panamabattle_videos(max_results=50):
@@ -704,5 +704,7 @@ def blog():
     posts = fetch_notion_posts() if not need_notion_keys else []
     return render_template('blog.html', title='UmkA каже', posts=posts, need_notion_keys=need_notion_keys)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 5050))
+    app.run(host="0.0.0.0", port=port)

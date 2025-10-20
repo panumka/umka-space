@@ -23,9 +23,6 @@
         <a href="{{ url_for('index') }}" class="logo">UmkA</a>
       </div>
       <nav class="main-nav">
-        <a class="nav-link {% if request.path == url_for('index') %}active{% endif %}" href="{{ url_for('index') }}">
-          UmkA СЛУХАТИ
-        </a>
         <a class="nav-link {% if request.path == url_for('panamabattle') %}active{% endif %}" href="{{ url_for('panamabattle') }}">
           UmkA на PANAMABATTLE
         </a>
