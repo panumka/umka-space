@@ -482,7 +482,7 @@ body {
 @media (max-width: 640px) {
   .header-inner {
     min-height: 52px;
-    gap: 8px;
+    gap: 20px;                 /* більша базова відстань між логотипом і навігацією */
     flex-wrap: nowrap !important; /* keep everything on one line */
   }
   .logo {
@@ -490,8 +490,9 @@ body {
     letter-spacing: 0.1px;
   }
   .main-nav {
-    gap: 10px;                 /* tighter spacing between items */
+    gap: 20px;                 /* однакова відстань між пунктами меню */
     flex-wrap: nowrap !important;
+    margin-left: 20px;         /* така ж відстань від логотипа до першого пункту */
   }
   .nav-link {
     padding: 6px 8px;          /* smaller paddings */
