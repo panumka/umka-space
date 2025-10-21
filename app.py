@@ -302,13 +302,12 @@ def fetch_stream_releases(limit: int = 24):
 
         # Collect platform links (read if present, skip empties)
         platforms_spec = [
-            ("spotify", "Spotify"),
-            ("apple", "Apple Music"),
+            ("spotify",      "Spotify"),
+            ("apple",        "Apple Music"),
             ("youtubemusic", "YouTube Music"),
-            ("youtube", "YouTube"),
-            ("deezer", "Deezer"),
-            ("soundcloud", "SoundCloud"),
-            ("bandcamp", "Bandcamp"),
+            ("deezer",       "Deezer"),
+            ("itunes",       "iTunes"),
+            ("youtube",      "YouTube"),
         ]
         links = []
         # Try name variants to be tolerant (e.g., property might be named "Spotify" or "spotify")
@@ -520,13 +519,12 @@ def release_json(page_id: str):
             return None
 
         platforms_spec = [
-            ("spotify", "Spotify"),
-            ("apple", "Apple Music"),
+            ("spotify",      "Spotify"),
+            ("apple",        "Apple Music"),
             ("youtubemusic", "YouTube Music"),
-            ("youtube", "YouTube"),
-            ("deezer", "Deezer"),
-            ("soundcloud", "SoundCloud"),
-            ("bandcamp", "Bandcamp"),
+            ("deezer",       "Deezer"),
+            ("itunes",       "iTunes"),
+            ("youtube",      "YouTube"),
         ]
         links = []
         for key, label in platforms_spec:
