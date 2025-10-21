@@ -211,12 +211,15 @@ document.addEventListener("click", async (e) => {
           }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
           .stream-modal .platform-icon{
-            width:10px;
-            height:10px;
-            border-radius:4px;
-            background:#4d4d4d;      /* neutral default, can be colored later */
+            width:16px;
+            height:16px;
             display:inline-block;
-            flex:0 0 10px;
+            flex:0 0 16px;
+          }
+          .stream-modal .platform-icon svg{
+            display:block;
+            width:100%;
+            height:100%;
           }
           .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
@@ -306,6 +309,46 @@ document.addEventListener("click", async (e) => {
           streamRoot.querySelector(".platform-links");
 
         if (linksContainer) {
+          // --- brand icons (inline SVG) -------------------------------------
+          const ICON_SVGS = {
+            'spotify': `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="12" fill="#1DB954"/>
+                <path d="M17.3 15.5a.9.9 0 0 1-1.24.32c-3.41-2.09-7.7-.84-7.74-.83a.9.9 0 1 1-.52-1.72c.19-.06 4.89-1.41 8.76.92a.9.9 0 0 1 .34 1.31zM18.27 12.9a1 1 0 0 1-1.38.36c-3.9-2.36-9.84-1.03-9.9-1.02a1 1 0 0 1-.46-1.94c.26-.06 6.5-1.49 11.06 1.26a1 1 0 0 1 .68 1.34zM18.37 10.17c-4.38-2.6-11.08-1.46-11.36-1.41a1.1 1.1 0 0 1-.39-2.17c.32-.06 7.96-1.31 12.97 1.63a1.1 1.1 0 1 1-1.22 1.95z" fill="#0B0B0B"/>
+              </svg>`,
+            'apple music': `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="12" fill="#FA2D48"/>
+                <path d="M15.5 6.5v8.2a2.8 2.8 0 1 1-1.6-2.6V8.1l-4 .9v6.7a2.8 2.8 0 1 1-1.6-2.6V7.5l7.2-1z" fill="#fff"/>
+              </svg>`,
+            'itunes': `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="12" fill="#BF5AF2"/>
+                <path d="M16.5 6.7v7.9a2.7 2.7 0 1 1-1.6-2.5V8.3l-4 .9v6.4a2.7 2.7 0 1 1-1.6-2.5V7.7l7.2-1z" fill="#fff"/>
+              </svg>`,
+            'youtube music': `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="12" fill="#FF0033"/>
+                <polygon points="10,8 16,12 10,16" fill="#fff"/>
+                <circle cx="12" cy="12" r="5.5" fill="none" stroke="#fff" stroke-width="2"/>
+              </svg>`,
+            'youtube': `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1" y="5" width="22" height="14" rx="4" fill="#FF0033"/>
+                <polygon points="10,9 16,12 10,15" fill="#fff"/>
+              </svg>`,
+            'deezer': `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2" y="14" width="4" height="4" fill="#22D1EE"/>
+                <rect x="7" y="12" width="4" height="6" fill="#7C4DFF"/>
+                <rect x="12" y="10" width="4" height="8" fill="#FFAA00"/>
+                <rect x="17" y="8" width="4" height="10" fill="#00E676"/>
+              </svg>`
+          };
+          function keyFromLabel(label){
+            return String(label || '').trim().toLowerCase();
+          }
+
           // --- helpers -------------------------------------------------------
           function normalizeUrl(u){
             if (!u) return "";
@@ -331,8 +374,10 @@ document.addEventListener("click", async (e) => {
             const a = document.createElement("a");
             a.href = url; a.target = "_blank"; a.rel = "noopener";
             a.className = "platform-row";
+            const k = keyFromLabel(label);
+            const svg = ICON_SVGS[k] || '';
             a.innerHTML = `
-              <span class="platform-icon" aria-hidden="true"></span>
+              <span class="platform-icon" aria-hidden="true">${svg}</span>
               <span class="platform-name">${label}</span>
             `;
             linksContainer.appendChild(a);
@@ -412,7 +457,6 @@ document.addEventListener("click", async (e) => {
               rendered++;
             });
           }
-
           // If still nothing, leave empty
         }
         // --- /normalize platform links ---------------------------------------
