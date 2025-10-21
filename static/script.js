@@ -251,57 +251,29 @@ document.addEventListener("click", async (e) => {
           streamRoot.querySelector(".platform-links");
 
         if (linksContainer) {
-          const knownPlatforms = [
-            { key: "spotify", label: "Spotify" },
-            { key: "apple", label: "Apple Music" },
-            { key: "youtube_music", label: "YouTube Music" },
-            { key: "youtube", label: "YouTube" },
-            { key: "deezer", label: "Deezer" },
-            { key: "itunes", label: "iTunes" },
-            { key: "tidal", label: "TIDAL" },
-            { key: "soundcloud", label: "SoundCloud" },
-            { key: "bandcamp", label: "Bandcamp" },
-            { key: "amazon", label: "Amazon Music" },
-            { key: "yandex", label: "Yandex Music" },
-          ];
+          // Динамічно створюємо кнопки для всіх ключів, які є в JSON
+          Object.entries(j).forEach(([key, value]) => {
+            if (!value || typeof value !== "string" || !/^https?:\/\//i.test(value)) return;
 
-          const existingLinks = Array.from(linksContainer.querySelectorAll("a"));
-          const existingHrefs = existingLinks.map(a => a.href);
+            const label = key
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, c => c.toUpperCase()); // робимо "Apple Music" з "apple_music"
 
-          // Якщо якихось платформ не вистачає — створюємо елементи вручну
-          knownPlatforms.forEach(p => {
-            // Fallback: якщо Notion API повертає null/undefined, не пропускаємо ці поля, а пропускаємо пусті або невалідні URL
-            const url = typeof j[p.key] === "string" ? j[p.key] : (j[p.key] ?? "");
-            if (!url || typeof url !== "string" || !/^https?:\/\//i.test(url)) return;
-            const found = existingLinks.find(a => a.href.toLowerCase().includes(p.key));
-            if (!found) {
-              const a = document.createElement("a");
-              a.href = url;
-              a.target = "_blank";
-              a.rel = "noopener";
-              a.className = "platform-row";
-              a.innerHTML = `
-                <span class="platform-icon platform-${p.key}" aria-hidden="true"></span>
-                <span class="platform-name">${p.label}</span>
-              `;
-              linksContainer.appendChild(a);
-            }
-          });
+            const a = document.createElement("a");
+            a.href = value;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.className = "platform-row";
 
-          // unify existing ones
-          linksContainer.querySelectorAll("a").forEach(a => {
-            const href = a.href || "";
-            const lower = href.toLowerCase();
-            let key = knownPlatforms.find(p => lower.includes(p.key))?.key || "link";
-            const label = knownPlatforms.find(p => p.key === key)?.label || "Відкрити";
+            // для відомих платформ підставляємо правильну іконку
+            const iconKey = ["spotify", "apple", "youtube", "deezer", "itunes", "tidal", "soundcloud", "bandcamp", "amazon", "yandex"]
+              .find(p => key.toLowerCase().includes(p)) || "link";
 
-            a.setAttribute("target", "_blank");
-            a.setAttribute("rel", "noopener");
-            a.classList.add("platform-row");
             a.innerHTML = `
-              <span class="platform-icon platform-${key}" aria-hidden="true"></span>
+              <span class="platform-icon platform-${iconKey}" aria-hidden="true"></span>
               <span class="platform-name">${label}</span>
             `;
+            linksContainer.appendChild(a);
           });
         }
         // --- /normalize platform links ---------------------------------------
