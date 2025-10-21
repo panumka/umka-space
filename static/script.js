@@ -256,16 +256,13 @@ document.addEventListener("click", async (e) => {
           streamRoot.querySelector(".platform-links");
 
         if (linksContainer) {
-          // --- helpers for safer URL handling + richer platform mapping
+          // --- helpers -------------------------------------------------------
           function normalizeUrl(u){
             if (!u) return "";
             let s = String(u).trim();
             if (!s) return "";
-            // allow protocol-relative
             if (s.startsWith("//")) return "https:" + s;
-            // add protocol if missing
             if (!/^https?:\/\//i.test(s)) {
-              // if looks like domain/path, prepend https://
               if (/^[\w.-]+\.[\w.-]+(\/.*)?$/.test(s)) return "https://" + s;
             }
             return s;
@@ -276,104 +273,63 @@ document.addEventListener("click", async (e) => {
             if (!s) return false;
             if (/^https?:\/\//i.test(s)) return true;
             if (s.startsWith("//")) return true;
-            // domain.tld[/...]
             return /^[\w.-]+\.[\w.-]+(\/.*)?$/.test(s);
           }
 
-          const ORDER = [
-            { keys: ["spotify"],                       label: "Spotify",        icon: "spotify" },
-            { keys: ["apple_music","apple music","applemusic","itunes"], label: "Apple Music", icon: "apple" },
-            { keys: ["youtube_music","youtube music","ytmusic"],         label: "YouTube Music", icon: "youtube" },
-            { keys: ["youtube","youtu.be"],           label: "YouTube",        icon: "youtube" },
-            { keys: ["deezer"],                        label: "Deezer",         icon: "deezer" },
-            { keys: ["itunes","apple itunes","itunes store"], label: "iTunes", icon: "itunes" },
-            { keys: ["tidal"],                         label: "Tidal",          icon: "tidal" },
-            { keys: ["soundcloud"],                    label: "SoundCloud",     icon: "soundcloud" },
-            { keys: ["bandcamp"],                      label: "Bandcamp",       icon: "bandcamp" },
-            { keys: ["amazon","amazon_music","amazon music"], label: "Amazon Music", icon: "amazon" },
-            { keys: ["yandex","yandex_music","yandex music"], label: "Yandex Music", icon: "yandex" },
-          ];
-
-          // Try 1: flat keys on j (e.g. j.spotify, j.apple_music, ...)
-          const collected = new Map();
-          ORDER.forEach(def => {
-            for (const k of def.keys) {
-              if (isProbablyUrl(j[k])) { collected.set(def.label, { url: normalizeUrl(j[k]), icon: def.icon }); break; }
-            }
-          });
-
-          // Try 2: j.links array of {key,label,url} or {name,href}
-          if (Array.isArray(j.links)) {
-            j.links.forEach(it => {
-              const url = normalizeUrl(it.url || it.href);
-              if (!isProbablyUrl(url)) return;
-              const raw = (it.key || it.name || it.label || "").toString().toLowerCase();
-              const match = ORDER.find(def => def.keys.some(k => raw.includes(k)) || def.label.toLowerCase() === raw);
-              const label = match ? match.label : (it.label || it.name || "Link");
-              const icon  = match ? match.icon  : "link";
-              if (!collected.has(label)) collected.set(label, { url, icon });
-            });
-          }
-
-          // Try 3: map object j.properties or j.props like { "Spotify": "https://..." }
-          const props = j.properties || j.props || j.platforms || null;
-          if (props && typeof props === "object") {
-            Object.entries(props).forEach(([name, url]) => {
-              url = normalizeUrl(url);
-              if (!isProbablyUrl(url)) return;
-              const low = name.toLowerCase();
-              const match = ORDER.find(def => def.keys.some(k => low.includes(k)));
-              const label = match ? match.label : name;
-              const icon  = match ? match.icon  : "link";
-              if (!collected.has(label)) collected.set(label, { url, icon });
-            });
-          }
-
-          // Try 4: fallback – parse anchors that might already be inside HTML
-          if (collected.size === 0) {
-            streamRoot.querySelectorAll("a[href]").forEach(a => {
-              const url = normalizeUrl(a.getAttribute("href"));
-              if (!isProbablyUrl(url)) return;
-              const text = (a.textContent || "").trim();
-              const low  = text.toLowerCase();
-              const match = ORDER.find(def => def.keys.some(k => low.includes(k)));
-              const label = match ? match.label : (text || "Link");
-              const icon  = match ? match.icon  : "link";
-              if (!collected.has(label)) collected.set(label, { url, icon });
-            });
-          }
-
-          // 2) Render rows in the required order
-          linksContainer.innerHTML = "";
-          ORDER.forEach(def => {
-            const item = collected.get(def.label);
-            if (!item) return;
+          // renderer that keeps label EXACTLY as provided from Notion
+          function renderRow(label, url){
             const a = document.createElement("a");
-            a.href = item.url;
-            a.target = "_blank";
-            a.rel = "noopener";
+            a.href = url; a.target = "_blank"; a.rel = "noopener";
             a.className = "platform-row";
             a.innerHTML = `
-              <span class="platform-icon platform-${item.icon}" aria-hidden="true"></span>
-              <span class="platform-name">${def.label}</span>
-            `;
-            linksContainer.appendChild(a);
-          });
-
-          // 3) If there are extra platforms not in ORDER, append them after
-          for (const [label, item] of collected.entries()) {
-            if (ORDER.find(def => def.label === label)) continue;
-            const a = document.createElement("a");
-            a.href = item.url;
-            a.target = "_blank";
-            a.rel = "noopener";
-            a.className = "platform-row";
-            a.innerHTML = `
-              <span class="platform-icon platform-${item.icon}" aria-hidden="true"></span>
+              <span class="platform-icon" aria-hidden="true"></span>
               <span class="platform-name">${label}</span>
             `;
             linksContainer.appendChild(a);
           }
+
+          // Clear and render strictly in the order that comes from backend/Notion
+          linksContainer.innerHTML = "";
+
+          let rendered = 0;
+
+          // 1) Preferred: array j.links with explicit { label/name, url/href }
+          if (Array.isArray(j.links) && j.links.length){
+            j.links.forEach(it => {
+              const url   = normalizeUrl(it.url || it.href);
+              const label = (it.label || it.name || "").toString().trim();
+              if (!label || !isProbablyUrl(url)) return;
+              renderRow(label, url);
+              rendered++;
+            });
+          }
+
+          // 2) Fallback: object maps from backend (properties/props/platforms)
+          if (!rendered){
+            const maps = j.properties || j.props || j.platforms;
+            if (maps && typeof maps === 'object'){
+              Object.entries(maps).forEach(([label, url]) => {
+                const L = String(label).trim();
+                const U = normalizeUrl(url);
+                if (!L || !isProbablyUrl(U)) return;
+                renderRow(L, U);
+                rendered++;
+              });
+            }
+          }
+
+          // 3) Last resort: parse anchors already present in HTML; keep their text as label
+          if (!rendered){
+            streamRoot.querySelectorAll("a[href]").forEach(a => {
+              const url = normalizeUrl(a.getAttribute("href"));
+              const label = (a.textContent || "").trim();
+              if (!label || !isProbablyUrl(url)) return;
+              renderRow(label, url);
+              rendered++;
+            });
+          }
+
+          // If still nothing, leave empty
         }
         // --- /normalize platform links ---------------------------------------
       }
