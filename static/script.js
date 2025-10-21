@@ -176,10 +176,10 @@ document.addEventListener("click", async (e) => {
           .stream-modal .release-wrap{ display:flex; gap:16px; align-items:stretch; }
           /* Square cover (crop if needed) */
           .stream-modal img{
-            width:400px;
-            height:400px;
-            max-width:400px;
-            max-height:400px;
+            width:360px;
+            height:360px;
+            max-width:360px;
+            max-height:360px;
             object-fit:cover;
             border-radius:12px;
             display:block;
@@ -191,7 +191,7 @@ document.addEventListener("click", async (e) => {
             flex-direction:column;
             gap:6px;               /* tighter vertical rhythm */
             flex:1 1 auto;
-            max-height:400px;
+            max-height:360px;
             overflow:hidden;
           }
           /* Row height tuned: 6 rows * 34px + 5 gaps(6px) = 224px within 400px cover */
