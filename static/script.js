@@ -171,16 +171,21 @@ document.addEventListener("click", async (e) => {
       // inject lightweight inline styles so we don't depend on external CSS
       const styleEl = document.createElement("style");
       styleEl.textContent = `
-        .modal-dialog{ max-width: 780px; width: calc(100% - 24px); }
-        .stream-modal{ padding: 16px; }
-        .stream-modal .release-wrap{ display:flex; gap:16px; align-items:flex-start; }
-        .stream-modal img{ max-width:220px; width:220px; height:auto; border-radius:12px; display:block; }
-        .stream-modal .links{ min-width:260px; }
-        @media (max-width:640px){
-          .stream-modal .release-wrap{ flex-direction:column; }
-          .stream-modal img{ width:100%; max-width:100%; }
-        }
-      `;
+          .modal-dialog{ max-width: 780px; width: calc(100% - 24px); }
+          .stream-modal{ padding: 16px; }
+          .stream-modal .release-wrap{ display:flex; gap:16px; align-items:flex-start; }
+          .stream-modal img{ max-width:220px; width:220px; height:auto; border-radius:12px; display:block; }
+          .stream-modal .links{ min-width:260px; display:flex; flex-direction:column; gap:10px; }
+          .stream-modal .platform-row{ display:flex; align-items:center; gap:12px; padding:10px 14px; background:#151515; border:1px solid #222; border-radius:12px; text-decoration:none; color:#ddd; }
+          .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
+          .stream-modal .platform-icon{ width:14px; height:14px; border-radius:4px; background:#e04a3f; display:inline-block; flex:0 0 14px; }
+          .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+          @media (max-width:640px){
+            .stream-modal .release-wrap{ flex-direction:column; }
+            .stream-modal img{ width:100%; max-width:100%; }
+          }
+        `;
+
       dialog.prepend(styleEl);
 
       // If server didn't wrap, try to build a minimal wrapper around first image + the rest
@@ -251,28 +256,41 @@ document.addEventListener("click", async (e) => {
           streamRoot.querySelector(".platform-links");
 
         if (linksContainer) {
-          // Динамічно створюємо кнопки для всіх ключів, які є в JSON
-          Object.entries(j).forEach(([key, value]) => {
-            if (!value || typeof value !== "string" || !/^https?:\/\//i.test(value)) return;
+          // Очистити контейнер та сформувати кнопки в сталому порядку
+          linksContainer.innerHTML = "";
 
-            const label = key
-              .replace(/_/g, " ")
-              .replace(/\b\w/g, c => c.toUpperCase()); // робимо "Apple Music" з "apple_music"
+          const PLATFORM_ORDER = [
+            { key: "spotify",        label: "Spotify" },
+            { key: "apple_music",    label: "Apple Music" },
+            { key: "youtube_music",  label: "YouTube Music" },
+            { key: "youtube",        label: "YouTube" },
+            { key: "deezer",         label: "Deezer" },
+            { key: "itunes",         label: "iTunes" },
+            { key: "tidal",          label: "Tidal" },
+            { key: "soundcloud",     label: "SoundCloud" },
+            { key: "bandcamp",       label: "Bandcamp" },
+            { key: "amazon",         label: "Amazon Music" },
+            { key: "yandex",         label: "Yandex Music" }
+          ];
+
+          PLATFORM_ORDER.forEach(p => {
+            const val = j[p.key];
+            if (!val || typeof val !== "string" || !/^https?:\/\//i.test(val)) return;
 
             const a = document.createElement("a");
-            a.href = value;
+            a.href = val;
             a.target = "_blank";
             a.rel = "noopener";
             a.className = "platform-row";
 
-            // для відомих платформ підставляємо правильну іконку
             const iconKey = ["spotify", "apple", "youtube", "deezer", "itunes", "tidal", "soundcloud", "bandcamp", "amazon", "yandex"]
-              .find(p => key.toLowerCase().includes(p)) || "link";
+              .find(k => p.key.includes(k)) || "link";
 
             a.innerHTML = `
               <span class="platform-icon platform-${iconKey}" aria-hidden="true"></span>
-              <span class="platform-name">${label}</span>
+              <span class="platform-name">${p.label}</span>
             `;
+
             linksContainer.appendChild(a);
           });
         }
