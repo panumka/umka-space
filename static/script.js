@@ -250,45 +250,42 @@ document.addEventListener("click", async (e) => {
         });
 
         // --- normalize platform links into consistent rows --------------------
-        // helpers: allow links without protocol and loose detection
-        function normalizeUrl(u){
-          if(!u) return null;
-          let s = String(u).trim();
-          if(/^\/\//.test(s)) s = 'https:' + s;
-          if(!/^https?:\/\//i.test(s)) s = 'https://' + s;
-          return s;
-        }
-        function isUrlLike(s){
-          return typeof s === 'string' && /^(https?:\/\/|\/\/|[a-z0-9.-]+\.[a-z]{2,}\/?)/i.test(s.trim());
-        }
-        const ORDER = [
-          { keys: ["spotify"],                            label: "Spotify",        icon: "spotify" },
-          { keys: ["apple music","apple_music","applemusic"], label: "Apple Music",     icon: "apple" },
-          { keys: ["youtube music","youtube_music","ytmusic"], label: "YouTube Music",   icon: "youtube" },
-          { keys: ["youtube","youtu.be"],                 label: "YouTube",         icon: "youtube" },
-          { keys: ["deezer"],                             label: "Deezer",          icon: "deezer" },
-          { keys: ["itunes","apple itunes","i-tunes"],    label: "iTunes",          icon: "itunes" },
-          { keys: ["tidal"],                              label: "Tidal",           icon: "tidal" },
-          { keys: ["soundcloud"],                         label: "SoundCloud",      icon: "soundcloud" },
-          { keys: ["bandcamp"],                           label: "Bandcamp",        icon: "bandcamp" },
-          { keys: ["amazon music","amazon_music","amazon"], label: "Amazon Music",    icon: "amazon" },
-          { keys: ["yandex music","yandex_music","yandex"], label: "Yandex Music",    icon: "yandex" },
-        ];
+        const linksContainer =
+          streamRoot.querySelector(".links") ||
+          streamRoot.querySelector(".platforms") ||
+          streamRoot.querySelector(".platform-links");
+
+        if (linksContainer) {
+          // 1) Gather links from various possible response shapes
+          const ORDER = [
+            { keys: ["spotify"],                       label: "Spotify",        icon: "spotify" },
+            { keys: ["apple_music","applemusic"],      label: "Apple Music",     icon: "apple" },
+            { keys: ["youtube_music","ytmusic"],       label: "YouTube Music",   icon: "youtube" },
+            { keys: ["youtube"],                       label: "YouTube",         icon: "youtube" },
+            { keys: ["deezer"],                        label: "Deezer",          icon: "deezer" },
+            { keys: ["itunes","apple_itunes"],         label: "iTunes",          icon: "itunes" },
+            { keys: ["tidal"],                         label: "Tidal",           icon: "tidal" },
+            { keys: ["soundcloud"],                    label: "SoundCloud",      icon: "soundcloud" },
+            { keys: ["bandcamp"],                      label: "Bandcamp",        icon: "bandcamp" },
+            { keys: ["amazon","amazon_music"],         label: "Amazon Music",    icon: "amazon" },
+            { keys: ["yandex","yandex_music"],         label: "Yandex Music",    icon: "yandex" },
+          ];
+
+          function isUrl(s){ return typeof s === "string" && /^https?:\/\//i.test(s); }
 
           // Try 1: flat keys on j (e.g. j.spotify, j.apple_music, ...)
           const collected = new Map();
           ORDER.forEach(def => {
             for (const k of def.keys) {
-              const maybe = normalizeUrl(j[k]);
-              if (maybe && isUrlLike(maybe)) { collected.set(def.label, { url: maybe, icon: def.icon }); break; }
+              if (isUrl(j[k])) { collected.set(def.label, { url: j[k], icon: def.icon }); break; }
             }
           });
 
           // Try 2: j.links array of {key,label,url} or {name,href}
           if (Array.isArray(j.links)) {
             j.links.forEach(it => {
-              const url = normalizeUrl(it.url || it.href);
-              if (!isUrlLike(url)) return;
+              const url = it.url || it.href;
+              if (!isUrl(url)) return;
               const raw = (it.key || it.name || it.label || "").toString().toLowerCase();
               const match = ORDER.find(def => def.keys.some(k => raw.includes(k)) || def.label.toLowerCase() === raw);
               const label = match ? match.label : (it.label || it.name || "Link");
@@ -301,21 +298,20 @@ document.addEventListener("click", async (e) => {
           const props = j.properties || j.props || j.platforms || null;
           if (props && typeof props === "object") {
             Object.entries(props).forEach(([name, url]) => {
-              const urlNorm = normalizeUrl(url);
-              if (!isUrlLike(urlNorm)) return;
+              if (!isUrl(url)) return;
               const low = name.toLowerCase();
               const match = ORDER.find(def => def.keys.some(k => low.includes(k)));
               const label = match ? match.label : name;
               const icon  = match ? match.icon  : "link";
-              if (!collected.has(label)) collected.set(label, { url: urlNorm, icon });
+              if (!collected.has(label)) collected.set(label, { url, icon });
             });
           }
 
           // Try 4: fallback – parse anchors that might already be inside HTML
           if (collected.size === 0) {
             streamRoot.querySelectorAll("a[href]").forEach(a => {
-              const url = normalizeUrl(a.getAttribute("href"));
-              if (!isUrlLike(url)) return;
+              const url = a.getAttribute("href");
+              if (!isUrl(url)) return;
               const text = (a.textContent || "").trim();
               const low  = text.toLowerCase();
               const match = ORDER.find(def => def.keys.some(k => low.includes(k)));
