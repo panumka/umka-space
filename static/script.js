@@ -174,15 +174,64 @@ document.addEventListener("click", async (e) => {
           .modal-dialog{ max-width: 780px; width: calc(100% - 24px); max-height: 90vh; overflow:auto; }
           .stream-modal{ padding: 16px; }
           .stream-modal .release-wrap{ display:flex; gap:16px; align-items:stretch; }
-          .stream-modal img{ max-width:220px; width:220px; height:auto; border-radius:12px; display:block; }
-          .stream-modal .links{ min-width:260px; display:flex; flex-direction:column; gap:10px; flex:1 1 auto; max-height:none; overflow:visible; }
-          .stream-modal .platform-row{ display:flex; align-items:center; gap:12px; padding:8px 12px; background:#151515; border:1px solid #222; border-radius:12px; text-decoration:none; color:#ddd; font-size:0.95rem; }
+          /* Square cover (crop if needed) */
+          .stream-modal img{
+            width:220px;
+            height:220px;
+            max-width:220px;
+            max-height:220px;
+            object-fit:cover;
+            border-radius:12px;
+            display:block;
+          }
+          /* Links column sized to fit 6 rows into the 220px cover height */
+          .stream-modal .links{
+            min-width:260px;
+            display:flex;
+            flex-direction:column;
+            gap:6px;                 /* 5 gaps * 6px = 30px */
+            flex:1 1 auto;
+            max-height:220px;        /* matches cover */
+            overflow:hidden;         /* hide anything beyond 6 rows */
+          }
+          /* Row height tuned: 6 rows * 32px + 5 gaps(6px) = 222px (slight crop safe due to borders) */
+          .stream-modal .platform-row{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:6px 12px;        /* compact vertical padding */
+            background:#151515;
+            border:1px solid #222;
+            border-radius:12px;
+            text-decoration:none;
+            color:#ddd;
+            font-size:0.92rem;
+            min-height:32px;         /* target row height */
+            line-height:1.1;
+          }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
-          .stream-modal .platform-icon{ width:14px; height:14px; border-radius:4px; background:#e04a3f; display:inline-block; flex:0 0 14px; }
+          .stream-modal .platform-icon{
+            width:12px;
+            height:12px;
+            border-radius:4px;
+            background:#4d4d4d;      /* neutral default, can be colored later */
+            display:inline-block;
+            flex:0 0 12px;
+          }
           .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
           @media (max-width:640px){
             .stream-modal .release-wrap{ flex-direction:column; }
-            .stream-modal img{ width:100%; max-width:100%; }
+            .stream-modal img{
+              width:100%;
+              max-width:100%;
+              height:auto;           /* on narrow screens we drop the strict 1:1 to avoid extreme crops */
+              max-height:none;
+            }
+            .stream-modal .links{
+              max-height:none;       /* allow natural height on mobile */
+              overflow:visible;
+            }
           }
         `;
 
