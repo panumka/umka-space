@@ -189,12 +189,12 @@ document.addEventListener("click", async (e) => {
             min-width:200px;
             display:flex;
             flex-direction:column;
-            gap:10px;
+            gap:8px;
             flex:1 1 auto;
             max-height:400px;
             overflow:hidden;
           }
-          /* Row height tuned: 6 rows * 56px + 5 gaps(10px) = 390px */
+          /* Row height tuned: 6 rows * 48px + 5 gaps(8px) = 328px within 400px cover */
           .stream-modal .platform-row{
             display:flex;
             align-items:center;
@@ -206,7 +206,7 @@ document.addEventListener("click", async (e) => {
             text-decoration:none;
             color:#ddd;
             font-size:0.9rem;
-            height:56px;           /* 6 × 56 + 5 × 10 = 390px */
+            height:48px;           /* 6 × 48 + 5 × 8 = 328px within 400px cover */
             line-height:1;
           }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
@@ -292,9 +292,10 @@ document.addEventListener("click", async (e) => {
 
         // finally, hard-limit any image that might slip through
         streamRoot.querySelectorAll("img").forEach(img => {
-          img.style.maxWidth = "320px";
-          img.style.width = "320px";
-          img.style.height = "auto";
+          img.style.maxWidth = "400px";
+          img.style.width = "400px";
+          img.style.height = "400px";
+          img.style.objectFit = "cover";
           img.style.borderRadius = "12px";
         });
 
