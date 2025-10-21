@@ -273,9 +273,53 @@ body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 24px;
+  justify-content: center;
+  gap: 18px;
   width: 100%;
   padding: 8px 0 0;
+  min-height: 320px;
+}
+
+/* збільшена обкладинка */
+#stream-modal-root .modal-body img {
+  width: clamp(200px, 32vh, 260px) !important;
+  height: clamp(200px, 32vh, 260px) !important;
+  object-fit: cover;
+  border-radius: 12px;
+  flex: 0 0 auto;
+}
+
+/* правий блок із посиланнями */
+#stream-modal-root .platforms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  max-height: clamp(320px, 60vh, 480px);
+  overflow-y: auto;
+}
+
+/* кожен рядок платформи */
+#stream-modal-root .platform-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9rem;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+}
+
+#stream-modal-root .platform-row:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
 }
 
 #stream-modal-root .modal-body img {
