@@ -176,37 +176,37 @@ document.addEventListener("click", async (e) => {
           .stream-modal .release-wrap{ display:flex; gap:16px; align-items:stretch; }
           /* Square cover (crop if needed) */
           .stream-modal img{
-            width:220px;
-            height:220px;
-            max-width:220px;
-            max-height:220px;
+            width:280px;
+            height:280px;
+            max-width:280px;
+            max-height:280px;
             object-fit:cover;
             border-radius:12px;
             display:block;
           }
-          /* Links column sized to fit 6 rows into the 220px cover height */
+          /* Links column sized to fit 6 rows into the 280px cover height */
           .stream-modal .links{
             min-width:260px;
             display:flex;
             flex-direction:column;
-            gap:6px;                 /* 5 gaps * 6px = 30px */
+            gap:8px;                 /* 5 gaps * 8px = 40px */
             flex:1 1 auto;
-            max-height:220px;        /* matches cover */
+            max-height:280px;        /* matches cover */
             overflow:hidden;         /* hide anything beyond 6 rows */
           }
-          /* Row height tuned: 6 rows * 32px + 5 gaps(6px) = 222px (slight crop safe due to borders) */
+          /* Row height tuned: 6 rows * 40px + 5 gaps(8px) = 280px */
           .stream-modal .platform-row{
             display:flex;
             align-items:center;
             gap:10px;
-            padding:6px 12px;        /* compact vertical padding */
+            padding:8px 12px;        /* compact vertical padding */
             background:#151515;
             border:1px solid #222;
             border-radius:12px;
             text-decoration:none;
             color:#ddd;
             font-size:0.92rem;
-            min-height:32px;         /* target row height */
+            min-height:40px;         /* target row height */
             line-height:1.1;
           }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
@@ -292,8 +292,8 @@ document.addEventListener("click", async (e) => {
 
         // finally, hard-limit any image that might slip through
         streamRoot.querySelectorAll("img").forEach(img => {
-          img.style.maxWidth = "220px";
-          img.style.width = "220px";
+          img.style.maxWidth = "280px";
+          img.style.width = "280px";
           img.style.height = "auto";
           img.style.borderRadius = "12px";
         });
