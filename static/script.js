@@ -243,6 +243,67 @@ document.addEventListener("click", async (e) => {
           img.style.height = "auto";
           img.style.borderRadius = "12px";
         });
+
+        // --- normalize platform links into consistent rows --------------------
+        const linksContainer =
+          streamRoot.querySelector(".links") ||
+          streamRoot.querySelector(".platforms") ||
+          streamRoot.querySelector(".platform-links");
+
+        if (linksContainer) {
+          // helper: guess platform key from URL
+          const platformKey = (href = "") => {
+            const h = href.toLowerCase();
+            if (h.includes("spotify")) return "spotify";
+            if (h.includes("music.apple") || h.includes("itunes.apple")) return "apple";
+            if (h.includes("youtube")) return "youtube";
+            if (h.includes("youtu.be")) return "youtube";
+            if (h.includes("deezer")) return "deezer";
+            if (h.includes("tidal")) return "tidal";
+            if (h.includes("soundcloud")) return "soundcloud";
+            if (h.includes("bandcamp")) return "bandcamp";
+            if (h.includes("amazon")) return "amazon";
+            if (h.includes("yandex")) return "yandex";
+            return "link";
+          };
+
+          // helper: human label from key
+          const platformLabel = (key) => ({
+            spotify: "Spotify",
+            apple: "Apple Music",
+            youtube: "YouTube",
+            deezer: "Deezer",
+            tidal: "TIDAL",
+            soundcloud: "SoundCloud",
+            bandcamp: "Bandcamp",
+            amazon: "Amazon Music",
+            yandex: "Yandex Music",
+            link: "Відкрити"
+          })[key] || "Відкрити";
+
+          linksContainer.querySelectorAll("a").forEach((a) => {
+            // ensure target/rel
+            a.setAttribute("target", "_blank");
+            a.setAttribute("rel", "noopener");
+
+            // strip any trailing "PLAY" or variants from inner text
+            const raw = (a.textContent || "").replace(/\s+/g, " ").trim();
+            let text = raw.replace(/\bPLAY\b/gi, "").trim();
+            // if empty or generic, derive from URL
+            const key = platformKey(a.href);
+            if (!text || text.length < 2) {
+              text = platformLabel(key);
+            }
+
+            // apply unified class and inner markup; icon classes will be styled in CSS
+            a.classList.add("platform-row");
+            a.innerHTML = `
+              <span class="platform-icon platform-${key}" aria-hidden="true"></span>
+              <span class="platform-name">${text}</span>
+            `;
+          });
+        }
+        // --- /normalize platform links ---------------------------------------
       }
     }
   } catch (err) {

@@ -612,3 +612,67 @@ body {
     font-size: 12px;
   }
 }
+/* === Stream Modal: UnitedMasters-like stripes === */
+#stream-modal-root .platforms a{
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+#stream-modal-root .platform-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  background: rgba(0,0,0,0.45);
+  border:1px solid rgba(255,255,255,0.08);
+  transition: background .2s ease, border-color .2s ease, transform .12s ease;
+}
+
+#stream-modal-root .platform-row:hover{
+  background: rgba(0,0,0,0.6);
+  border-color: rgba(255,255,255,0.18);
+  transform: translateY(-1px);
+}
+
+#stream-modal-root .platform-icon{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  background:#333;
+  display:inline-block;
+  flex:0 0 28px;
+}
+
+/* per-platform icon colors */
+#stream-modal-root .platform-icon.platform-spotify{ background:#1DB954; }
+#stream-modal-root .platform-icon.platform-apple{ background:#ffffff; }
+#stream-modal-root .platform-icon.platform-youtubemusic{ background:#ff0033; }
+#stream-modal-root .platform-icon.platform-youtube{ background:#ff0000; }
+#stream-modal-root .platform-icon.platform-deezer{ background:#00c7f2; }
+#stream-modal-root .platform-icon.platform-tidal{ background:#0a0a0a; border:1px solid #444; }
+#stream-modal-root .platform-icon.platform-soundcloud{ background:#ff7700; }
+#stream-modal-root .platform-icon.platform-bandcamp{ background:#1da0a6; }
+#stream-modal-root .platform-icon.platform-amazon{ background:#ff9900; }
+#stream-modal-root .platform-icon.platform-yandex{ background:#ffcc00; }
+
+#stream-modal-root .platform-name{
+  color:#e9e9e9;
+  font-weight:600;
+  letter-spacing:.2px;
+}
+
+/* keep the dialog nicely centered on all screens */
+#stream-modal-root .modal{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  overflow:auto;
+}
+
+#stream-modal-root .modal-dialog{
+  margin: auto;                 /* center inside flex container */
+  width: clamp(320px, 88vw, 680px);
+}
