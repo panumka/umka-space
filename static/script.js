@@ -251,55 +251,56 @@ document.addEventListener("click", async (e) => {
           streamRoot.querySelector(".platform-links");
 
         if (linksContainer) {
-          // helper: guess platform key from URL
-          const platformKey = (href = "") => {
-            const h = href.toLowerCase();
-            if (h.includes("spotify")) return "spotify";
-            if (h.includes("music.apple") || h.includes("itunes.apple")) return "apple";
-            if (h.includes("youtube")) return "youtube";
-            if (h.includes("youtu.be")) return "youtube";
-            if (h.includes("deezer")) return "deezer";
-            if (h.includes("tidal")) return "tidal";
-            if (h.includes("soundcloud")) return "soundcloud";
-            if (h.includes("bandcamp")) return "bandcamp";
-            if (h.includes("amazon")) return "amazon";
-            if (h.includes("yandex")) return "yandex";
-            return "link";
-          };
+          const knownPlatforms = [
+            { key: "spotify", label: "Spotify" },
+            { key: "apple", label: "Apple Music" },
+            { key: "youtube_music", label: "YouTube Music" },
+            { key: "youtube", label: "YouTube" },
+            { key: "deezer", label: "Deezer" },
+            { key: "itunes", label: "iTunes" },
+            { key: "tidal", label: "TIDAL" },
+            { key: "soundcloud", label: "SoundCloud" },
+            { key: "bandcamp", label: "Bandcamp" },
+            { key: "amazon", label: "Amazon Music" },
+            { key: "yandex", label: "Yandex Music" },
+          ];
 
-          // helper: human label from key
-          const platformLabel = (key) => ({
-            spotify: "Spotify",
-            apple: "Apple Music",
-            youtube: "YouTube",
-            deezer: "Deezer",
-            tidal: "TIDAL",
-            soundcloud: "SoundCloud",
-            bandcamp: "Bandcamp",
-            amazon: "Amazon Music",
-            yandex: "Yandex Music",
-            link: "Відкрити"
-          })[key] || "Відкрити";
+          const existingLinks = Array.from(linksContainer.querySelectorAll("a"));
+          const existingHrefs = existingLinks.map(a => a.href);
 
-          linksContainer.querySelectorAll("a").forEach((a) => {
-            // ensure target/rel
+          // Якщо якихось платформ не вистачає — створюємо елементи вручну
+          knownPlatforms.forEach(p => {
+            // Fallback: якщо Notion API повертає null/undefined, не пропускаємо ці поля, а пропускаємо пусті або невалідні URL
+            const url = typeof j[p.key] === "string" ? j[p.key] : (j[p.key] ?? "");
+            if (!url || typeof url !== "string" || !/^https?:\/\//i.test(url)) return;
+            const found = existingLinks.find(a => a.href.toLowerCase().includes(p.key));
+            if (!found) {
+              const a = document.createElement("a");
+              a.href = url;
+              a.target = "_blank";
+              a.rel = "noopener";
+              a.className = "platform-row";
+              a.innerHTML = `
+                <span class="platform-icon platform-${p.key}" aria-hidden="true"></span>
+                <span class="platform-name">${p.label}</span>
+              `;
+              linksContainer.appendChild(a);
+            }
+          });
+
+          // unify existing ones
+          linksContainer.querySelectorAll("a").forEach(a => {
+            const href = a.href || "";
+            const lower = href.toLowerCase();
+            let key = knownPlatforms.find(p => lower.includes(p.key))?.key || "link";
+            const label = knownPlatforms.find(p => p.key === key)?.label || "Відкрити";
+
             a.setAttribute("target", "_blank");
             a.setAttribute("rel", "noopener");
-
-            // strip any trailing "PLAY" or variants from inner text
-            const raw = (a.textContent || "").replace(/\s+/g, " ").trim();
-            let text = raw.replace(/\bPLAY\b/gi, "").trim();
-            // if empty or generic, derive from URL
-            const key = platformKey(a.href);
-            if (!text || text.length < 2) {
-              text = platformLabel(key);
-            }
-
-            // apply unified class and inner markup; icon classes will be styled in CSS
             a.classList.add("platform-row");
             a.innerHTML = `
               <span class="platform-icon platform-${key}" aria-hidden="true"></span>
-              <span class="platform-name">${text}</span>
+              <span class="platform-name">${label}</span>
             `;
           });
         }

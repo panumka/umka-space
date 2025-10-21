@@ -282,8 +282,8 @@ body {
 
 /* збільшена обкладинка */
 #stream-modal-root .modal-body img {
-  width: clamp(200px, 32vh, 260px) !important;
-  height: clamp(200px, 32vh, 260px) !important;
+  width: clamp(240px, 36vh, 300px) !important;
+  height: clamp(240px, 36vh, 300px) !important;
   object-fit: cover;
   border-radius: 12px;
   flex: 0 0 auto;
@@ -297,10 +297,10 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  max-height: clamp(320px, 60vh, 480px);
-  overflow-y: auto;
+  max-height: none;
+  /* дозволяє вмістити до 8 платформ без скролу */
 }
 
 /* кожен рядок платформи */
@@ -308,11 +308,11 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
 }
 
@@ -323,13 +323,11 @@ body {
 }
 
 #stream-modal-root .modal-body img {
-  width: 200px !important;         /* same size as card */
-  max-width: 200px !important;
-  height: 200px !important;        /* square shape like card */
-  max-height: 200px !important;
+  width: clamp(240px, 36vh, 300px) !important;
+  height: clamp(240px, 36vh, 300px) !important;
   object-fit: cover;
   border-radius: 12px;
-  flex: 0 0 200px;
+  flex: 0 0 auto;
 }
 
 #stream-modal-root .platforms {
@@ -338,8 +336,9 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   width: 100%;
+  max-height: none;
 }
 
 #stream-modal-root .platforms a {
@@ -666,11 +665,12 @@ body {
 #stream-modal-root .platform-row{
   display:flex;
   align-items:center;
-  gap:12px;
-  padding:12px 14px;
-  border-radius:12px;
+  gap:10px;
+  padding:8px 12px;
+  border-radius:10px;
   background: rgba(0,0,0,0.45);
   border:1px solid rgba(255,255,255,0.08);
+  font-size:0.85rem;
   transition: background .2s ease, border-color .2s ease, transform .12s ease;
 }
 
@@ -719,4 +719,14 @@ body {
 #stream-modal-root .modal-dialog{
   margin: auto;                 /* center inside flex container */
   width: clamp(320px, 88vw, 680px);
+}
+@media (max-width: 700px) {
+  #stream-modal-root .modal-body img {
+    width: 200px !important;
+    height: 200px !important;
+  }
+  #stream-modal-root .platform-row {
+    font-size: 0.8rem;
+    padding: 7px 10px;
+  }
 }
