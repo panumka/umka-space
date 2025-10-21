@@ -186,37 +186,37 @@ document.addEventListener("click", async (e) => {
           }
           /* Links column sized to fit 6 rows into the 400px cover height */
           .stream-modal .links{
-            min-width:200px;
+            min-width:168px;       /* a bit narrower */
             display:flex;
             flex-direction:column;
-            gap:8px;
+            gap:6px;               /* tighter vertical rhythm */
             flex:1 1 auto;
             max-height:400px;
             overflow:hidden;
           }
-          /* Row height tuned: 6 rows * 48px + 5 gaps(8px) = 328px within 400px cover */
+          /* Row height tuned: 6 rows * 34px + 5 gaps(6px) = 224px within 400px cover */
           .stream-modal .platform-row{
             display:flex;
             align-items:center;
             gap:10px;
-            padding:0 12px;
+            padding:6px 10px;      /* slightly taller than text, slimmer horizontally */
             background:#151515;
             border:1px solid #222;
-            border-radius:12px;
+            border-radius:10px;
             text-decoration:none;
             color:#ddd;
-            font-size:0.9rem;
-            height:48px;           /* 6 × 48 + 5 × 8 = 328px within 400px cover */
+            font-size:0.95rem;
+            height:34px;           /* compact row so 6+ rows comfortably fit next to 400px cover */
             line-height:1;
           }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
           .stream-modal .platform-icon{
-            width:12px;
-            height:12px;
+            width:10px;
+            height:10px;
             border-radius:4px;
             background:#4d4d4d;      /* neutral default, can be colored later */
             display:inline-block;
-            flex:0 0 12px;
+            flex:0 0 10px;
           }
           .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
