@@ -358,13 +358,47 @@ document.addEventListener("click", async (e) => {
           if (!rendered){
             const maps = j.properties || j.props || j.platforms;
             if (maps && typeof maps === 'object'){
-              Object.entries(maps).forEach(([label, url]) => {
-                const L = String(label).trim();
-                const U = normalizeUrl(url);
-                if (!L || !isProbablyUrl(U)) return;
+              // Build a normalized label->url map while preserving insertion order
+              const entries = Object.entries(maps).map(([label, url]) => {
+                return [String(label).trim(), normalizeUrl(url)];
+              }).filter(([L, U]) => L && isProbablyUrl(U));
+
+              // Preferred order to match Notion columns exactly
+              const preferredOrder = [
+                'Spotify',
+                'Apple Music',
+                'YouTube Music',
+                'Deezer',
+                'iTunes',
+                'YouTube'
+              ].map(s => s.toLowerCase());
+
+              // Helper to do case-insensitive pick
+              const consumed = new Set();
+              function pickByName(nameLc){
+                for (let i = 0; i < entries.length; i++){
+                  if (consumed.has(i)) continue;
+                  const [L, U] = entries[i];
+                  if (L.toLowerCase() === nameLc){
+                    renderRow(L, U);
+                    consumed.add(i);
+                    return true;
+                  }
+                }
+                return false;
+              }
+
+              // 1) Render in preferred order (only those that exist)
+              preferredOrder.forEach(nLc => pickByName(nLc));
+
+              // 2) Render any remaining platforms in their original order
+              for (let i = 0; i < entries.length; i++){
+                if (consumed.has(i)) continue;
+                const [L, U] = entries[i];
                 renderRow(L, U);
-                rendered++;
-              });
+              }
+
+              rendered += entries.length;
             }
           }
 
