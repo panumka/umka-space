@@ -186,7 +186,7 @@ document.addEventListener("click", async (e) => {
           }
           /* Links column sized to fit 6 rows into the 320px cover height */
           .stream-modal .links{
-            min-width:260px;
+            min-width:200px;
             display:flex;
             flex-direction:column;
             gap:10px;                 /* 5 gaps * 10px = 50px */
@@ -199,13 +199,13 @@ document.addEventListener("click", async (e) => {
             display:flex;
             align-items:center;
             gap:10px;
-            padding:8px 12px;        /* compact vertical padding */
+            padding:8px 10px;        /* compact vertical padding */
             background:#151515;
             border:1px solid #222;
             border-radius:12px;
             text-decoration:none;
             color:#ddd;
-            font-size:0.92rem;
+            font-size:0.9rem;
             min-height:45px;         /* target row height */
             line-height:1.1;
           }
