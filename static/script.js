@@ -176,25 +176,25 @@ document.addEventListener("click", async (e) => {
           .stream-modal .release-wrap{ display:flex; gap:16px; align-items:stretch; }
           /* Square cover (crop if needed) */
           .stream-modal img{
-            width:280px;
-            height:280px;
-            max-width:280px;
-            max-height:280px;
+            width:320px;
+            height:320px;
+            max-width:320px;
+            max-height:320px;
             object-fit:cover;
             border-radius:12px;
             display:block;
           }
-          /* Links column sized to fit 6 rows into the 280px cover height */
+          /* Links column sized to fit 6 rows into the 320px cover height */
           .stream-modal .links{
             min-width:260px;
             display:flex;
             flex-direction:column;
-            gap:8px;                 /* 5 gaps * 8px = 40px */
+            gap:10px;                 /* 5 gaps * 10px = 50px */
             flex:1 1 auto;
-            max-height:280px;        /* matches cover */
+            max-height:320px;        /* matches cover */
             overflow:hidden;         /* hide anything beyond 6 rows */
           }
-          /* Row height tuned: 6 rows * 40px + 5 gaps(8px) = 280px */
+          /* Row height tuned: 6 rows * 45px + 5 gaps(10px) = 320px */
           .stream-modal .platform-row{
             display:flex;
             align-items:center;
@@ -206,7 +206,7 @@ document.addEventListener("click", async (e) => {
             text-decoration:none;
             color:#ddd;
             font-size:0.92rem;
-            min-height:40px;         /* target row height */
+            min-height:45px;         /* target row height */
             line-height:1.1;
           }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
@@ -292,8 +292,8 @@ document.addEventListener("click", async (e) => {
 
         // finally, hard-limit any image that might slip through
         streamRoot.querySelectorAll("img").forEach(img => {
-          img.style.maxWidth = "280px";
-          img.style.width = "280px";
+          img.style.maxWidth = "320px";
+          img.style.width = "320px";
           img.style.height = "auto";
           img.style.borderRadius = "12px";
         });
