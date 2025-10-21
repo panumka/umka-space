@@ -256,43 +256,102 @@ document.addEventListener("click", async (e) => {
           streamRoot.querySelector(".platform-links");
 
         if (linksContainer) {
-          // Очистити контейнер та сформувати кнопки в сталому порядку
-          linksContainer.innerHTML = "";
-
-          const PLATFORM_ORDER = [
-            { key: "spotify",        label: "Spotify" },
-            { key: "apple_music",    label: "Apple Music" },
-            { key: "youtube_music",  label: "YouTube Music" },
-            { key: "youtube",        label: "YouTube" },
-            { key: "deezer",         label: "Deezer" },
-            { key: "itunes",         label: "iTunes" },
-            { key: "tidal",          label: "Tidal" },
-            { key: "soundcloud",     label: "SoundCloud" },
-            { key: "bandcamp",       label: "Bandcamp" },
-            { key: "amazon",         label: "Amazon Music" },
-            { key: "yandex",         label: "Yandex Music" }
+          // 1) Gather links from various possible response shapes
+          const ORDER = [
+            { keys: ["spotify"],                       label: "Spotify",        icon: "spotify" },
+            { keys: ["apple_music","applemusic"],      label: "Apple Music",     icon: "apple" },
+            { keys: ["youtube_music","ytmusic"],       label: "YouTube Music",   icon: "youtube" },
+            { keys: ["youtube"],                       label: "YouTube",         icon: "youtube" },
+            { keys: ["deezer"],                        label: "Deezer",          icon: "deezer" },
+            { keys: ["itunes","apple_itunes"],         label: "iTunes",          icon: "itunes" },
+            { keys: ["tidal"],                         label: "Tidal",           icon: "tidal" },
+            { keys: ["soundcloud"],                    label: "SoundCloud",      icon: "soundcloud" },
+            { keys: ["bandcamp"],                      label: "Bandcamp",        icon: "bandcamp" },
+            { keys: ["amazon","amazon_music"],         label: "Amazon Music",    icon: "amazon" },
+            { keys: ["yandex","yandex_music"],         label: "Yandex Music",    icon: "yandex" },
           ];
 
-          PLATFORM_ORDER.forEach(p => {
-            const val = j[p.key];
-            if (!val || typeof val !== "string" || !/^https?:\/\//i.test(val)) return;
+          function isUrl(s){ return typeof s === "string" && /^https?:\/\//i.test(s); }
 
+          // Try 1: flat keys on j (e.g. j.spotify, j.apple_music, ...)
+          const collected = new Map();
+          ORDER.forEach(def => {
+            for (const k of def.keys) {
+              if (isUrl(j[k])) { collected.set(def.label, { url: j[k], icon: def.icon }); break; }
+            }
+          });
+
+          // Try 2: j.links array of {key,label,url} or {name,href}
+          if (Array.isArray(j.links)) {
+            j.links.forEach(it => {
+              const url = it.url || it.href;
+              if (!isUrl(url)) return;
+              const raw = (it.key || it.name || it.label || "").toString().toLowerCase();
+              const match = ORDER.find(def => def.keys.some(k => raw.includes(k)) || def.label.toLowerCase() === raw);
+              const label = match ? match.label : (it.label || it.name || "Link");
+              const icon  = match ? match.icon  : "link";
+              if (!collected.has(label)) collected.set(label, { url, icon });
+            });
+          }
+
+          // Try 3: map object j.properties or j.props like { "Spotify": "https://..." }
+          const props = j.properties || j.props || j.platforms || null;
+          if (props && typeof props === "object") {
+            Object.entries(props).forEach(([name, url]) => {
+              if (!isUrl(url)) return;
+              const low = name.toLowerCase();
+              const match = ORDER.find(def => def.keys.some(k => low.includes(k)));
+              const label = match ? match.label : name;
+              const icon  = match ? match.icon  : "link";
+              if (!collected.has(label)) collected.set(label, { url, icon });
+            });
+          }
+
+          // Try 4: fallback – parse anchors that might already be inside HTML
+          if (collected.size === 0) {
+            streamRoot.querySelectorAll("a[href]").forEach(a => {
+              const url = a.getAttribute("href");
+              if (!isUrl(url)) return;
+              const text = (a.textContent || "").trim();
+              const low  = text.toLowerCase();
+              const match = ORDER.find(def => def.keys.some(k => low.includes(k)));
+              const label = match ? match.label : (text || "Link");
+              const icon  = match ? match.icon  : "link";
+              if (!collected.has(label)) collected.set(label, { url, icon });
+            });
+          }
+
+          // 2) Render rows in the required order
+          linksContainer.innerHTML = "";
+          ORDER.forEach(def => {
+            const item = collected.get(def.label);
+            if (!item) return;
             const a = document.createElement("a");
-            a.href = val;
+            a.href = item.url;
             a.target = "_blank";
             a.rel = "noopener";
             a.className = "platform-row";
-
-            const iconKey = ["spotify", "apple", "youtube", "deezer", "itunes", "tidal", "soundcloud", "bandcamp", "amazon", "yandex"]
-              .find(k => p.key.includes(k)) || "link";
-
             a.innerHTML = `
-              <span class="platform-icon platform-${iconKey}" aria-hidden="true"></span>
-              <span class="platform-name">${p.label}</span>
+              <span class="platform-icon platform-${item.icon}" aria-hidden="true"></span>
+              <span class="platform-name">${def.label}</span>
             `;
-
             linksContainer.appendChild(a);
           });
+
+          // 3) If there are extra platforms not in ORDER, append them after
+          for (const [label, item] of collected.entries()) {
+            if (ORDER.find(def => def.label === label)) continue;
+            const a = document.createElement("a");
+            a.href = item.url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.className = "platform-row";
+            a.innerHTML = `
+              <span class="platform-icon platform-${item.icon}" aria-hidden="true"></span>
+              <span class="platform-name">${label}</span>
+            `;
+            linksContainer.appendChild(a);
+          }
         }
         // --- /normalize platform links ---------------------------------------
       }
