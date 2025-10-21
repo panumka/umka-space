@@ -171,12 +171,12 @@ document.addEventListener("click", async (e) => {
       // inject lightweight inline styles so we don't depend on external CSS
       const styleEl = document.createElement("style");
       styleEl.textContent = `
-          .modal-dialog{ max-width: 780px; width: calc(100% - 24px); }
+          .modal-dialog{ max-width: 780px; width: calc(100% - 24px); max-height: 90vh; overflow:auto; }
           .stream-modal{ padding: 16px; }
-          .stream-modal .release-wrap{ display:flex; gap:16px; align-items:flex-start; }
+          .stream-modal .release-wrap{ display:flex; gap:16px; align-items:stretch; }
           .stream-modal img{ max-width:220px; width:220px; height:auto; border-radius:12px; display:block; }
-          .stream-modal .links{ min-width:260px; display:flex; flex-direction:column; gap:10px; }
-          .stream-modal .platform-row{ display:flex; align-items:center; gap:12px; padding:10px 14px; background:#151515; border:1px solid #222; border-radius:12px; text-decoration:none; color:#ddd; }
+          .stream-modal .links{ min-width:260px; display:flex; flex-direction:column; gap:10px; flex:1 1 auto; max-height:none; overflow:visible; }
+          .stream-modal .platform-row{ display:flex; align-items:center; gap:12px; padding:8px 12px; background:#151515; border:1px solid #222; border-radius:12px; text-decoration:none; color:#ddd; font-size:0.95rem; }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
           .stream-modal .platform-icon{ width:14px; height:14px; border-radius:4px; background:#e04a3f; display:inline-block; flex:0 0 14px; }
           .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
