@@ -13,13 +13,68 @@ Image.MAX_IMAGE_PIXELS = int(os.environ.get("UMKA_MAX_IMAGE_PIXELS", "30000000")
 import pillow_heif
 import base64
 
+# --- requests retrying session helpers ---
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+def _requests_session():
+    retry = Retry(
+        total=3,
+        backoff_factor=0.3,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=("GET", "POST"),
+        raise_on_status=False,
+    )
+    s = requests.Session()
+    s.mount("http://", HTTPAdapter(max_retries=retry))
+    s.mount("https://", HTTPAdapter(max_retries=retry))
+    return s
+
+_REQ = _requests_session()
+
 
 load_dotenv(override=True)
 pillow_heif.register_heif_opener()
 
 
 
+
 app = Flask(__name__)
+
+# Optional: gzip/brotli compression if flask-compress is installed
+try:
+    from flask_compress import Compress  # type: ignore
+    Compress(app)
+except Exception:
+    pass
+
+# Static files cache (can be overridden by env UMKA_STATIC_MAX_AGE)
+try:
+    from datetime import timedelta
+    _static_max_age = int(os.environ.get("UMKA_STATIC_MAX_AGE", "604800"))  # 7 days
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = timedelta(seconds=_static_max_age)
+except Exception:
+    pass
+
+# Security headers for every response (relaxed CSP to avoid breaking current UI)
+@app.after_request
+def _set_default_headers(resp):
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "DENY")
+    resp.headers.setdefault("Referrer-Policy", "no-referrer")
+    # If app is served via HTTPS, uncomment the next line to enforce HSTS
+    resp.headers.setdefault("Strict-Transport-Security", "max-age=15552000; includeSubDomains")
+    # Relaxed CSP that works with current inline styles/scripts and remote images
+    csp = (
+        "default-src 'self'; "
+        "img-src 'self' data: https:; "
+        "style-src 'self' 'unsafe-inline'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "connect-src 'self' https:; "
+        "frame-ancestors 'none'"
+    )
+    resp.headers.setdefault("Content-Security-Policy", csp)
+    return resp
 
 # Inject current year into all templates
 @app.context_processor
@@ -39,9 +94,24 @@ def _b64encode_filter(s):
 
 app.jinja_env.filters["b64encode"] = _b64encode_filter
 
+#
 # Simple per-user (IP) cache for YouTube results
 YT_CACHE = {}
 YT_TTL_SEC = int(os.environ.get("UMKA_TTL_SEC", "1800"))  # default 30 minutes
+
+# Very simple IP-based rate limit for /proxy_img
+PROXY_LIMIT_COUNT = int(os.environ.get("UMKA_PROXY_LIMIT_COUNT", "60"))          # 60 hits
+PROXY_LIMIT_WINDOW = int(os.environ.get("UMKA_PROXY_LIMIT_WINDOW_SEC", "300"))  # per 5 minutes
+_PROXY_BUCKETS = {}  # ip -> {"ts": epoch, "count": n}
+
+def _rate_limited(ip: str) -> bool:
+    now = time.time()
+    b = _PROXY_BUCKETS.get(ip)
+    if not b or now - b["ts"] > PROXY_LIMIT_WINDOW:
+        _PROXY_BUCKETS[ip] = {"ts": now, "count": 1}
+        return False
+    b["count"] += 1
+    return b["count"] > PROXY_LIMIT_COUNT
 
 # Notion credentials (optional)
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY", "").strip()
@@ -96,7 +166,7 @@ def fetch_panamabattle_videos(max_results=50):
             params["pageToken"] = page_token
 
         try:
-            r = requests.get(base_url, params=params, timeout=10)
+            r = _REQ.get(base_url, params=params, timeout=10)
             if r.status_code != 200:
                 print("[YT API] status", r.status_code, "->", (r.text[:200] if r.text else ""))
                 break
@@ -655,6 +725,12 @@ def proxy_img():
         app.logger.warning('[proxy_img] missing url param')
         return Response('missing url', status=400)
 
+    # Simple rate-limit per client IP
+    client_ip = (request.headers.get('X-Forwarded-For') or request.remote_addr or '0.0.0.0').split(',')[0].strip()
+    if _rate_limited(client_ip):
+        app.logger.warning("[proxy_img] rate-limited ip=%s", client_ip)
+        return Response("rate limited", status=429)
+
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36',
@@ -745,6 +821,27 @@ def blog():
     need_notion_keys = not (NOTION_API_KEY and NOTION_DATABASE_ID)
     posts = fetch_notion_posts() if not need_notion_keys else []
     return render_template('blog.html', title='UmkA каже', posts=posts, need_notion_keys=need_notion_keys)
+
+
+# --- healthcheck, robots.txt, security.txt endpoints ---
+@app.route("/healthz")
+def healthz():
+    return jsonify(status="ok"), 200
+
+@app.route("/robots.txt")
+def robots_txt():
+    body = "User-agent: *\nAllow: /\n"
+    return Response(body, mimetype="text/plain")
+
+@app.route("/.well-known/security.txt")
+def security_txt():
+    contact = os.environ.get("UMKA_SECURITY_CONTACT", "mailto:admin@umka.space")
+    body = (
+        f"Contact: {contact}\n"
+        "Preferred-Languages: uk, en\n"
+        "Policy: https://umka.space/\n"
+    )
+    return Response(body, mimetype="text/plain")
 
 if __name__ == "__main__":
     import os
