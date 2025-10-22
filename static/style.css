@@ -811,31 +811,3 @@ body {
     padding-left: 36px !important; /* трохи більше, щоб іконки не обрізались при свайпі */
   }
 }
-
-/* --- Scrollable modal body on mobile --- */
-#stream-modal-root .modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.8);
-  overflow: hidden; /* fix background */
-}
-
-#stream-modal-root .modal-dialog {
-  max-height: 90dvh; /* prevent overflow beyond viewport */
-  overflow-y: auto;  /* scroll inside modal */
-  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
-  background: #111;
-  border-radius: 14px;
-  padding: 20px;
-  width: clamp(320px, 92vw, 680px);
-  box-sizing: border-box;
-}
-
-#stream-modal-root .platforms {
-  overflow-y: auto;
-  max-height: 70dvh; /* only list scrolls if long */
-  padding-right: 4px;
-}
