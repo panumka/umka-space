@@ -207,7 +207,7 @@ document.addEventListener("click", async (e) => {
             color:#ddd;
             font-size:0.95rem;
             height:34px;           /* compact row so 6+ rows comfortably fit next to 400px cover */
-            line-height:1;
+            line-height:1.2;
           }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
           .stream-modal .platform-icon{
@@ -215,6 +215,7 @@ document.addEventListener("click", async (e) => {
             height:16px;
             display:inline-block;
             flex:0 0 16px;
+            overflow: visible;
           }
           .stream-modal .platform-icon svg{
             display:block;
@@ -224,6 +225,12 @@ document.addEventListener("click", async (e) => {
           .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
           @media (max-width:640px){
+            .modal-dialog{
+              max-width: 640px;
+              width: 96vw;
+              margin: 12px auto;
+              box-sizing: border-box;
+            }
             .stream-modal .release-wrap{ flex-direction:column; }
             .stream-modal img{
               width:100%;
@@ -234,6 +241,17 @@ document.addEventListener("click", async (e) => {
             .stream-modal .links{
               max-height:none;       /* allow natural height on mobile */
               overflow:visible;
+              width:100%;
+            }
+            .stream-modal .platform-row{
+              height: auto;              /* allow natural height */
+              min-height: 44px;          /* comfortable tap target */
+              padding: 10px 14px;        /* a bit more padding on mobile */
+            }
+            .stream-modal .platform-icon{
+              width: 22px;
+              height: 22px;
+              flex: 0 0 22px;
             }
           }
         `;
