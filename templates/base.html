@@ -13,6 +13,18 @@
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
   <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
   <meta name="theme-color" content="#111111">
+  <!-- Meta SEO + Open Graph -->
+  <meta name="description" content="UmkA.space — офіційний сайт UmkA: музика, PANAMABATTLE, блог і думки.">
+  <meta property="og:title" content="UmkA.space">
+  <meta property="og:description" content="UmkA — музика, PANAMABATTLE, блог і думки.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://umka.space/">
+  <meta property="og:image" content="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
+  <meta property="og:locale" content="uk_UA">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="UmkA.space">
+  <meta name="twitter:description" content="UmkA — музика, PANAMABATTLE, блог і думки.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
   <script defer src="{{ url_for('static', filename='script.js', v='3') }}"></script>
   <style>
     .logo-main {
@@ -28,17 +40,17 @@
     <div class="container header-inner">
       <div class="brand">
         <!-- Лого потім; зараз просто назва згідно з вимогою: U та A великі -->
-        <a href="{{ url_for('index') }}" class="logo">
+        <a href="{{ url_for('index') }}" class="logo" aria-label="UmkA music">
           <span class="logo-main">UmkA</span>
           <span class="logo-sub" style="display:block; line-height:1;">music</span>
         </a>
       </div>
       <nav class="main-nav" aria-label="Головна навігація">
-        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}" {% if active == 'panamabattle' %}aria-current="page"{% endif %}>
+        <a href="/panamabattle" aria-label="UmkA PANAMABATTLE" class="nav-link {% if active == 'panamabattle' %}active{% endif %}" {% if active == 'panamabattle' %}aria-current="page"{% endif %}>
           <span class="nav-top">UmkA</span><br>
           <span class="nav-bottom">PANAMABATTLE</span>
         </a>
-        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}" {% if active == 'blog' %}aria-current="page"{% endif %}>
+        <a href="/blog" aria-label="UmkA каже" class="nav-link {% if active == 'blog' %}active{% endif %}" {% if active == 'blog' %}aria-current="page"{% endif %}>
           <span class="nav-top">UmkA</span><br>
           <span class="nav-bottom">каже</span>
         </a>
@@ -53,6 +65,7 @@
   <footer class="site-footer">
     <div class="container">
       <small>© UmkA, {{ current_year }}</small>
+      <div style="display:none;">health:ok</div>
     </div>
   </footer>
 </body>
