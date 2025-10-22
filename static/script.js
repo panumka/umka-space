@@ -139,6 +139,10 @@ document.addEventListener("click", async (e) => {
     return el;
   })();
 
+  // scroll lock helpers
+  const lockScroll = () => { document.body.dataset.scrollLocked = '1'; document.body.style.overflow = 'hidden'; };
+  const unlockScroll = () => { delete document.body.dataset.scrollLocked; document.body.style.overflow = ''; };
+
   // loading state
   root.innerHTML = `
     <div class="modal" role="dialog" aria-modal="true">
@@ -148,6 +152,7 @@ document.addEventListener("click", async (e) => {
       </div>
     </div>
   `;
+  lockScroll();
 
   try {
     const r = await fetch(`/release_json/${pageId}`);
@@ -165,11 +170,31 @@ document.addEventListener("click", async (e) => {
       </div>
     `;
 
+    // close/backdrop handlers
+    const modalEl = root.querySelector('.modal');
+    const dialogEl = root.querySelector('.modal-dialog');
+    const backdropEl = root.querySelector('.modal-backdrop');
+    const closeEls = root.querySelectorAll('[data-close]');
+    function closeStreamModal(){
+      root.innerHTML = '';
+      unlockScroll();
+    }
+    backdropEl && backdropEl.addEventListener('click', closeStreamModal);
+    closeEls.forEach(el => el.addEventListener('click', closeStreamModal));
+    modalEl && modalEl.addEventListener('click', (ev)=>{
+      if (!dialogEl) return;
+      if (!dialogEl.contains(ev.target)) closeStreamModal();
+    });
+    document.addEventListener('keydown', function onEsc(ev){
+      if (ev.key === 'Escape'){ closeStreamModal(); document.removeEventListener('keydown', onEsc); }
+    });
+
     // enforce compact cover size + two-column layout regardless of server HTML
     const dialog = root.querySelector(".modal-dialog");
     if (dialog) {
       // inject lightweight inline styles so we don't depend on external CSS
       const styleEl = document.createElement("style");
+      styleEl.id = 'stream-inline-css';
       styleEl.textContent = `
           .modal-dialog{ max-width: 780px; width: calc(100% - 24px); max-height: 90vh; overflow:auto; }
           .stream-modal{ padding: 16px; }
@@ -256,7 +281,9 @@ document.addEventListener("click", async (e) => {
           }
         `;
 
-      dialog.prepend(styleEl);
+      if (!dialog.querySelector('#stream-inline-css')) {
+        dialog.prepend(styleEl);
+      }
 
       // If server didn't wrap, try to build a minimal wrapper around first image + the rest
       const streamRoot = dialog.querySelector(".stream-modal");
@@ -313,9 +340,9 @@ document.addEventListener("click", async (e) => {
 
         // finally, hard-limit any image that might slip through
         streamRoot.querySelectorAll("img").forEach(img => {
-          img.style.maxWidth = "400px";
-          img.style.width = "400px";
-          img.style.height = "400px";
+          img.style.maxWidth = "360px";
+          img.style.width = "360px";
+          img.style.height = "360px";
           img.style.objectFit = "cover";
           img.style.borderRadius = "12px";
         });
@@ -501,15 +528,16 @@ document.addEventListener("click", async (e) => {
 
 // Allow closing modal by clicking outside the dialog or on backdrop
 document.addEventListener('click', (e) => {
-  const modal = document.querySelector('.modal.show, .modal');
+  const modal = document.querySelector('.modal');
   if (!modal) return;
   const dialog = modal.querySelector('.modal-dialog');
   if (!dialog) return;
-
   const clickedOutside = !dialog.contains(e.target);
   const clickedBackdrop = e.target.classList.contains('modal-backdrop');
   if (clickedOutside || clickedBackdrop) {
-    modal.remove();
+    const root = document.getElementById('stream-modal-root') || document.body;
+    if (root && root.contains(modal)) root.innerHTML = '';
+    if (document.body.dataset.scrollLocked) document.body.style.overflow = '';
   }
 });
 // --- /Stream Modal FETCH ------------------------------------------------------

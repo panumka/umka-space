@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
   <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
   <meta name="theme-color" content="#111111">
-  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='script.js', v='3') }}"></script>
   <style>
     .logo-main {
       font-size: 22px;
@@ -33,12 +33,12 @@
           <span class="logo-sub" style="display:block; line-height:1;">music</span>
         </a>
       </div>
-      <nav class="main-nav">
-        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}">
+      <nav class="main-nav" aria-label="Головна навігація">
+        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}" {% if active == 'panamabattle' %}aria-current="page"{% endif %}>
           <span class="nav-top">UmkA</span><br>
           <span class="nav-bottom">PANAMABATTLE</span>
         </a>
-        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}">
+        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}" {% if active == 'blog' %}aria-current="page"{% endif %}>
           <span class="nav-top">UmkA</span><br>
           <span class="nav-bottom">каже</span>
         </a>
@@ -52,7 +52,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <small>© UmkA, {{ 2025 }}</small>
+      <small>© UmkA, {{ current_year }}</small>
     </div>
   </footer>
 </body>

@@ -18,7 +18,14 @@ load_dotenv(override=True)
 pillow_heif.register_heif_opener()
 
 
+
 app = Flask(__name__)
+
+# Inject current year into all templates
+@app.context_processor
+def inject_now():
+    import datetime as _dt
+    return {"current_year": _dt.datetime.utcnow().year}
 
 # Register Jinja filter: b64encode (URL-safe)
 def _b64encode_filter(s):
