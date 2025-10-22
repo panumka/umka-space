@@ -738,6 +738,17 @@ body {
     max-width: 640px;
     margin: 12px auto;
     box-sizing: border-box;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  #stream-modal-root .modal {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
   }
 
   /* Список лінків не обрізається і займає всю ширину */
@@ -745,13 +756,13 @@ body {
     width: 100%;
     max-height: none;
     overflow: visible;
-    padding-left: 10px;
+    padding-left: 16px;
   }
 
   /* Більша tap-ціль і без обрізання контенту */
   #stream-modal-root .platform-row {
     min-height: 48px;       /* трохи більше місця */
-    padding: 12px 16px;
+    padding: 12px 18px;
     line-height: 1.3;
   }
 
