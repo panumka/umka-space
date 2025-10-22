@@ -730,3 +730,41 @@ body {
     padding: 7px 10px;
   }
 }
+/* --- Mobile fixes for stream modal (icons clipping & dialog width) --- */
+@media (max-width: 640px) {
+  /* Тримай діалог всередині екрана з невеликими полями */
+  .modal-dialog {
+    width: 96vw;
+    max-width: 640px;
+    margin: 12px auto;
+    box-sizing: border-box;
+  }
+
+  /* Список лінків не обрізається і займає всю ширину */
+  .stream-modal .links {
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Більша tap-ціль і без обрізання контенту */
+  .stream-modal .platform-row {
+    min-height: 44px;       /* замість height */
+    padding: 10px 14px;
+    line-height: 1.2;
+  }
+
+  /* Іконки не підрізаються, масштабуються в межах контейнера */
+  .stream-modal .platform-icon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    display: inline-block;
+  }
+  .stream-modal .platform-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+  }
+}
