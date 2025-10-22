@@ -8,6 +8,8 @@ import time
 import io
 from urllib.parse import unquote, unquote_plus
 from PIL import Image
+# Safety: guard against decompression-bomb attacks in Pillow
+Image.MAX_IMAGE_PIXELS = int(os.environ.get("UMKA_MAX_IMAGE_PIXELS", "30000000"))  # default 30M px
 import pillow_heif
 import base64
 
@@ -617,15 +619,22 @@ def panamabattle():
 @app.route('/proxy_img')
 def proxy_img():
     """Проксі для зображень із Notion: конвертує HEIC/HEIF або application/octet-stream у JPEG.
-    Підтримує два способи передавання URL:
-      - параметр `b` — URL у base64 (безпечніше для довгих підписаних посилань)
-      - параметр `u` — звичайний URL (буде розкодовуватись через unquote_plus)
+    Робить додаткові захисні перевірки:
+      - перевіряє Content-Length і блокує великі файли
+      - стрімить завантаження та відсікає якщо перевищено ліміт (без алокації всієї пам'яті)
+      - перевіряє Content-Type (припускає image/* або octet-stream)
+      - захищає від DecompressionBombError при відкритті через Pillow
+    Параметри конфігурації через оточення:
+      - UMKA_PROXY_MAX_BYTES (int) — макс байт для завантаження (за замовчуванням 5_000_000)
+      - UMKA_MAX_IMAGE_PIXELS    (int) — max pixels для Pillow (додано вище)
     """
+    # Config
+    MAX_BYTES = int(os.environ.get("UMKA_PROXY_MAX_BYTES", "5000000"))  # default 5 MB
+
     # 1) Читаємо URL
     raw_b = request.args.get('b')
     if raw_b:
         try:
-            # add missing padding for urlsafe base64 if necessary
             pad = (-len(raw_b)) % 4
             raw_b_padded = raw_b + ("=" * pad)
             url = base64.urlsafe_b64decode(raw_b_padded.encode('utf-8')).decode('utf-8').strip()
@@ -640,38 +649,67 @@ def proxy_img():
         return Response('missing url', status=400)
 
     try:
-        # 2) Тягнемо файл із CDN/Notion з дружнім UA
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36',
             'Accept': '*/*',
         }
-        r = requests.get(url, timeout=20, headers=headers, allow_redirects=True)
+        # Stream the response and impose size checks
+        r = requests.get(url, timeout=20, headers=headers, allow_redirects=True, stream=True)
         app.logger.info('[proxy_img] upstream %s -> %s', url.split('?')[0], r.status_code)
 
         if r.status_code != 200:
-            # Повертаємо прозорий 1x1 GIF замість помилки, щоб не ламати верстку
             blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
             return Response(blank, headers={'Content-Type': 'image/gif'})
 
         content_type = (r.headers.get('Content-Type') or '').lower()
-        raw = r.content or b''
-        app.logger.debug('[proxy_img] content-type=%s, size=%s', content_type, len(raw))
+        # If upstream provides Content-Length, reject too-large files early
+        try:
+            cl = int(r.headers.get('Content-Length')) if r.headers.get('Content-Length') else None
+        except Exception:
+            cl = None
+        if cl and cl > MAX_BYTES:
+            app.logger.warning('[proxy_img] upstream content-length too large: %s', cl)
+            return Response('too large', status=413)
 
-        # helper: convert any bytes to JPEG and send as response
+        # Acceptable types: image/* or application/octet-stream (we'll try to convert)
+        if not (content_type.startswith('image/') or 'octet-stream' in content_type or content_type == ''):
+            app.logger.warning('[proxy_img] unacceptable content-type: %s', content_type)
+            return Response('unsupported media type', status=415)
+
+        # Stream and accumulate up to MAX_BYTES
+        raw_chunks = io.BytesIO()
+        total = 0
+        for chunk in r.iter_content(chunk_size=8192):
+            if chunk:
+                total += len(chunk)
+                if total > MAX_BYTES:
+                    app.logger.warning('[proxy_img] download exceeded max bytes (%s)', total)
+                    return Response('too large', status=413)
+                raw_chunks.write(chunk)
+        raw = raw_chunks.getvalue()
+
+        # Helper: convert any bytes to JPEG and send as response with bomb protection
         def _as_jpeg(img_bytes: bytes) -> Response:
-            im = Image.open(io.BytesIO(img_bytes))
-            out = io.BytesIO()
-            im.convert('RGB').save(out, format='JPEG', quality=88)
-            out.seek(0)
-            resp = send_file(out, mimetype='image/jpeg')
-            resp.headers['Cache-Control'] = 'public, max-age=86400'
-            return resp
+            try:
+                im = Image.open(io.BytesIO(img_bytes))
+                # convert and send
+                out = io.BytesIO()
+                im.convert('RGB').save(out, format='JPEG', quality=88)
+                out.seek(0)
+                resp = send_file(out, mimetype='image/jpeg')
+                resp.headers['Cache-Control'] = 'public, max-age=86400'
+                return resp
+            except Exception as e:
+                # If Pillow raises DecompressionBombError or other parsing errors, log and fallback
+                app.logger.warning('[proxy_img] _as_jpeg failed: %r', e)
+                blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+                return Response(blank, headers={'Content-Type': 'image/gif'})
 
-        # 3) HEIC/HEIF → JPEG
+        # HEIC/HEIF -> JPEG check based on content-type or extension
         if ('heic' in content_type) or ('heif' in content_type) or url.lower().endswith(('.heic', '.heif')):
             return _as_jpeg(raw)
 
-        # 4) Якщо це вже image/* — повертаємо як є
+        # If it's image/* return raw bytes with same Content-Type
         if content_type.startswith('image/') and raw:
             resp = Response(raw, headers={
                 'Content-Type': content_type,
@@ -679,14 +717,13 @@ def proxy_img():
             })
             return resp
 
-        # 5) Невідомий тип (наприклад, application/octet-stream) — пробуємо як JPEG
+        # Otherwise try to open and convert
         try:
             if raw:
                 return _as_jpeg(raw)
         except Exception as e:
             app.logger.warning('[proxy_img] fallback-to-jpeg failed: %r', e)
 
-        # 6) Останній фолбек — прозорий 1x1 gif
         blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
         return Response(blank, headers={'Content-Type': 'image/gif'})
 
