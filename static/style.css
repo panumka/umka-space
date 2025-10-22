@@ -964,3 +964,8 @@ body.modal-open {
 
 /* Hide footer while any modal is open */
 body.modal-open .site-footer { display: none !important; }
+
+/* Hide footer whenever any modal with .show is present (works even without body class) */
+body:has(#stream-modal-root .modal.show) .site-footer,
+body:has(#post-modal-root .modal.show) .site-footer,
+body:has(.modal.show) .site-footer { display: none !important; }
