@@ -811,3 +811,76 @@ body {
     padding-left: 36px !important; /* трохи більше, щоб іконки не обрізались при свайпі */
   }
 }
+# /* === Visual polish pack (non‑breaking enhancements) === */
+:root {
+  --accent: #a78bfa;          /* violet accent */
+  --accent-2: #22d3ee;        /* cyan accent */
+  --ring-shadow: 0 0 0 3px rgba(167,139,250,.35);
+}
+
+/* smoother micro‑interactions */
+.nav-link, .pill, .btn-platform, .platform-row, .video-card, .card, .release-card {
+  transition: transform .18s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease, color .2s ease;
+}
+
+/* active tab underline with gradient */
+.nav-link.active::after{
+  content:"";
+  display:block;
+  height:2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius:2px;
+  margin-top:6px;
+}
+
+/* accessible focus ring */
+.nav-link:focus-visible,
+.platforms a:focus-visible,
+button:focus-visible,
+.platform-row:focus-visible,
+.release-card:focus-visible,
+.cover:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-shadow);
+}
+
+/* subtle elevation + hover lift for cards */
+.cover, .release-card, .video-card, .card {
+  box-shadow: 0 1px 0 rgba(255,255,255,.02) inset, 0 30px 80px rgba(0,0,0,.45);
+}
+.release-card:hover, .video-card:hover, .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,.45);
+}
+
+/* play icon gentle react */
+.play-icon{ transition: transform .2s ease, opacity .2s ease; }
+.release-card:hover .play-icon{ opacity:.95; transform: scale(1.06); }
+
+/* nicer buttons/pills */
+.btn-platform, .pill{
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.12);
+}
+.btn-platform:hover, .pill:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+  border-color: rgba(255,255,255,.22);
+}
+
+/* a bit of glass on stream modal rows */
+#stream-modal-root .platform-row{ backdrop-filter: blur(2px); }
+
+/* pretty text selection */
+::selection{ background: rgba(167,139,250,.35); color:#fff; }
+
+/* reduced‑motion respect */
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; animation:none !important; }
+}
+
+/* slim dark scrollbar (WebKit) */
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:#0e0e0e; }
+::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:8px; border:2px solid #0e0e0e; }
+::-webkit-scrollbar-thumb:hover{ background:#383838; }
