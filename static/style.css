@@ -884,3 +884,72 @@ button:focus-visible,
 ::-webkit-scrollbar-track{ background:#0e0e0e; }
 ::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:8px; border:2px solid #0e0e0e; }
 ::-webkit-scrollbar-thumb:hover{ background:#383838; }
+# /* === Accent Glow (Option 1) — stronger, visible on hover/focus === */
+:root { --accent-rgb: 167,139,250; }
+
+/* hover glow for interactive elements */
+.nav-link:hover,
+.nav-link:focus-visible,
+.pill:hover,
+.pill:focus-visible,
+.btn-platform:hover,
+.btn-platform:focus-visible,
+#stream-modal-root .platform-row:hover,
+#stream-modal-root .platform-row:focus-visible,
+.release-card:hover,
+.release-card:focus-visible,
+.video-card:hover,
+.video-card:focus-visible,
+.card:hover,
+.card:focus-visible {
+  box-shadow:
+    0 0 0 2px rgba(var(--accent-rgb), .28),
+    0 10px 28px rgba(var(--accent-rgb), .18),
+    0 2px 10px rgba(0,0,0,.35);
+  border-color: rgba(var(--accent-rgb), .35) !important;
+}
+
+/* subtle text accent on active items */
+.main-nav .nav-link.active { color: #fff; }
+.main-nav .nav-link.active span:first-child { color: var(--text); }
+
+/* === Subtle Grain Overlay (Option 2) — adds depth to dark bg === */
+body::before{
+  content:"";
+  position: fixed;
+  inset: -2rem;             /* slight bleed outside viewport edges */
+  pointer-events: none;
+  z-index: 0;               /* sits under app content but above bg */
+  opacity: .055;            /* overall grain intensity */
+  mix-blend-mode: overlay;  /* blend with dark background */
+  background-size: 220px 220px; /* tile size */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100' height='100' filter='url(%23n)'/></svg>");
+}
+
+/* ensure stacking contexts keep header/content above grain */
+.site-header{ position: relative; z-index: 2; }
+.content{ position: relative; z-index: 1; }
+.site-footer{ position: relative; z-index: 1; }
+
+/* toggleable stronger accent — add `.accent-strong` to <body> to preview */
+body.accent-strong .nav-link:hover,
+body.accent-strong .pill:hover,
+body.accent-strong .btn-platform:hover,
+body.accent-strong #stream-modal-root .platform-row:hover,
+body.accent-strong .release-card:hover,
+body.accent-strong .video-card:hover,
+body.accent-strong .card:hover {
+  box-shadow:
+    0 0 0 3px rgba(var(--accent-rgb), .35),
+    0 18px 48px rgba(var(--accent-rgb), .2),
+    0 3px 14px rgba(0,0,0,.4);
+}
+
+/* respect reduced-motion and avoid flicker on mobile */
+@media (prefers-reduced-motion: reduce){
+  body::before{ opacity:.045; }
+}
+
+@media (max-width: 640px){
+  body::before{ opacity:.05; background-size: 180px 180px; }
+}
