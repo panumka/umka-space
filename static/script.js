@@ -547,3 +547,30 @@ document.addEventListener('click', (e) => {
   }
 });
 // --- /Stream Modal FETCH ------------------------------------------------------
+// === Footer hide/show on modal open/close ===
+const footer = document.querySelector('footer');
+
+function hideFooter() {
+  if (footer) footer.style.display = 'none';
+}
+
+function showFooter() {
+  if (footer) footer.style.display = '';
+}
+
+// Якщо модалка керується кнопкою або подією відкриття
+document.addEventListener('openStreamModal', hideFooter);
+document.addEventListener('closeStreamModal', showFooter);
+
+// Якщо твій код відкриває модалку через клас або вручну
+const modalRoot = document.getElementById('stream-modal-root');
+if (modalRoot) {
+  const observer = new MutationObserver(() => {
+    if (modalRoot.classList.contains('active') || modalRoot.style.display === 'block') {
+      hideFooter();
+    } else {
+      showFooter();
+    }
+  });
+  observer.observe(modalRoot, { attributes: true, attributeFilter: ['class', 'style'] });
+}
