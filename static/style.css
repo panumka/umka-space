@@ -374,7 +374,7 @@ body {
 #stream-modal-root .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   overflow: hidden;
   z-index: 0;
   -webkit-backdrop-filter: blur(2px);
@@ -393,8 +393,15 @@ body {
   -webkit-filter: blur(18px);
   filter: blur(18px);
   transform: scale(1.06);
+  opacity: .5;
 }
-
+#stream-modal-root .modal-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1;
+}
 /* зробимо текст і кнопки в модалці світлішими/контрастнішими */
 #stream-modal-root .modal-dialog {
   position: relative;
@@ -901,8 +908,8 @@ button:focus-visible,
 .video-card:focus-visible,
 .card:hover,
 .card:focus-visible {
-  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), .08);
-  border-color: rgba(var(--accent-rgb), .10) !important;
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), .05);
+  border-color: rgba(var(--accent-rgb), .06) !important;
 }
 
 /* subtle text accent on active items */
