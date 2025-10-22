@@ -738,13 +738,13 @@ body {
     max-width: 640px;
     margin: 12px auto;
     box-sizing: border-box;
-    padding-left: max(36px, env(safe-area-inset-left));
-    padding-right: max(36px, env(safe-area-inset-right));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
   }
 
   #stream-modal-root .modal {
-    padding-left: max(30px, env(safe-area-inset-left));
-    padding-right: max(30px, env(safe-area-inset-right));
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -756,22 +756,21 @@ body {
     width: 100%;
     max-height: none;
     overflow: visible;
-    padding-left: 28px;
-    padding-right: 16px;
+    padding-left: 26px;
   }
 
   /* Більша tap-ціль і без обрізання контенту */
   #stream-modal-root .platform-row {
     min-height: 48px;       /* трохи більше місця */
-    padding: 12px 24px;
+    padding: 12px 18px;
     line-height: 1.3;
   }
 
   /* Іконки — з запасом і без обрізання */
   #stream-modal-root .platform-icon {
-    width: 32px;
-    height: 32px;
-    flex: 0 0 32px;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
