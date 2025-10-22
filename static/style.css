@@ -961,3 +961,6 @@ body.modal-open {
   overflow: hidden;
   height: 100vh; /* iOS fix */
 }
+
+/* Hide footer while any modal is open */
+body.modal-open .site-footer { display: none !important; }
