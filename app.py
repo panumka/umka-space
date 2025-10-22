@@ -40,7 +40,23 @@ pillow_heif.register_heif_opener()
 
 
 app = Flask(__name__)
+# --- Auto cache-busting for static files (adds ?v=<mtime>) ---
+from flask import url_for as _flask_url_for
 
+@app.context_processor
+def _override_url_for():
+    def dated_url_for(endpoint, **values):
+        if endpoint == 'static':
+            filename = values.get('filename')
+            if filename:
+                try:
+                    file_path = os.path.join(app.static_folder, filename)
+                    values['v'] = int(os.stat(file_path).st_mtime)
+                except Exception:
+                    # якщо файл не знайдено — просто пропускаємо
+                    pass
+        return _flask_url_for(endpoint, **values)
+    return dict(url_for=dated_url_for)
 # Optional: gzip/brotli compression if flask-compress is installed
 try:
     from flask_compress import Compress  # type: ignore
