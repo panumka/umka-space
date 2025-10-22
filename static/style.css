@@ -969,3 +969,9 @@ body.modal-open .site-footer { display: none !important; }
 body:has(#stream-modal-root .modal.show) .site-footer,
 body:has(#post-modal-root .modal.show) .site-footer,
 body:has(.modal.show) .site-footer { display: none !important; }
+
+/* Extra guard: hide footer whenever modal roots are populated */
+body:has(#stream-modal-root .modal) .site-footer,
+body:has(#post-modal-root .modal) .site-footer,
+body:has(#stream-modal-root:not(:empty)) .site-footer,
+body:has(#post-modal-root:not(:empty)) .site-footer { display: none !important; }
