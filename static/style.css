@@ -743,8 +743,8 @@ body {
   }
 
   #stream-modal-root .modal {
-    padding-left: max(22px, env(safe-area-inset-left));
-    padding-right: max(22px, env(safe-area-inset-right));
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -756,8 +756,7 @@ body {
     width: 100%;
     max-height: none;
     overflow: visible;
-    padding-left: 34px !important;
-    box-sizing: border-box;
+    padding-left: 32px; /* left inset equals icon width so icons never clip when swiping */
   }
 
   /* Більша tap-ціль і без обрізання контенту */
@@ -765,7 +764,6 @@ body {
     min-height: 48px;       /* трохи більше місця */
     padding: 12px 18px;
     line-height: 1.3;
-    box-sizing: border-box;
   }
 
   /* Іконки — з запасом і без обрізання */
