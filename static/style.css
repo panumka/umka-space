@@ -756,7 +756,7 @@ body {
     width: 100%;
     max-height: none;
     overflow: visible;
-    padding-left: 32px; /* left inset equals icon width so icons never clip when swiping */
+    padding-left: 26px;
   }
 
   /* Більша tap-ціль і без обрізання контенту */
@@ -782,5 +782,27 @@ body {
     height: 100%;
     display: block;
     overflow: visible;
+  }
+
+  /* --- Inserted: Reduce platform-row height & prevent icon clipping --- */
+  #stream-modal-root .modal-dialog {
+    overflow: visible !important;
+  }
+
+  #stream-modal-root .platforms {
+    padding-left: 34px;
+    margin-left: 4px;
+    overflow: visible !important;
+  }
+
+  #stream-modal-root .platform-row {
+    overflow: visible !important;
+    min-height: 38px; /* lower stripes height */
+    padding: 6px 12px; /* tighter spacing */
+  }
+
+  #stream-modal-root .modal {
+    overflow-x: visible !important;
+    overscroll-behavior: contain;
   }
 }
