@@ -232,7 +232,7 @@ body {
 #stream-modal-root .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.96);
   display: flex;
   align-items: center;       /* vertical center */
   justify-content: center;   /* horizontal center */
@@ -374,7 +374,7 @@ body {
 #stream-modal-root .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0,0,0,0.9);
   overflow: hidden;
   z-index: 0;
   -webkit-backdrop-filter: blur(2px);
@@ -811,7 +811,7 @@ body {
     padding-left: 36px !important; /* трохи більше, щоб іконки не обрізались при свайпі */
   }
 }
-# /* === Visual polish pack (non‑breaking enhancements) === */
+/* === Visual polish pack (non-breaking enhancements) === */
 :root {
   --accent: #a78bfa;          /* violet accent */
   --accent-2: #22d3ee;        /* cyan accent */
@@ -884,10 +884,9 @@ button:focus-visible,
 ::-webkit-scrollbar-track{ background:#0e0e0e; }
 ::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:8px; border:2px solid #0e0e0e; }
 ::-webkit-scrollbar-thumb:hover{ background:#383838; }
-# /* === Accent Glow (Option 1) — stronger, visible on hover/focus === */
+/* === Accent Glow (minimal) — subtle outline on hover/focus === */
 :root { --accent-rgb: 167,139,250; }
 
-/* hover glow for interactive elements */
 .nav-link:hover,
 .nav-link:focus-visible,
 .pill:hover,
@@ -902,11 +901,8 @@ button:focus-visible,
 .video-card:focus-visible,
 .card:hover,
 .card:focus-visible {
-  box-shadow:
-    0 0 0 1px rgba(var(--accent-rgb), .16),
-    0 8px 20px rgba(var(--accent-rgb), .10),
-    0 1px 6px rgba(0,0,0,.28);
-  border-color: rgba(var(--accent-rgb), .18) !important;
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), .08);
+  border-color: rgba(var(--accent-rgb), .10) !important;
 }
 
 /* subtle text accent on active items */
