@@ -756,7 +756,7 @@ body {
     width: 100%;
     max-height: none;
     overflow: visible;
-    padding-left: 26px;
+    padding-left: 32px; /* left inset equals icon width so icons never clip when swiping */
   }
 
   /* Більша tap-ціль і без обрізання контенту */
