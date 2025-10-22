@@ -10,11 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const show = () => {
       modal.classList.add("show");
       document.body.classList.add("modal-open");
+      if (typeof hideFooter === 'function') hideFooter();
     };
 
     const hide = () => {
       modal.classList.remove("show");
       document.body.classList.remove("modal-open");
+      if (typeof showFooter === 'function') showFooter();
     };
   
     open.addEventListener("click", show);
@@ -35,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.remove();
     document.body.style.overflow = '';
     document.body.classList.remove('modal-open');
+    if (typeof showFooter === 'function') showFooter();
   }
 
   function openModalWithHTML(title, date, html){
@@ -79,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     root.appendChild(overlay);
     document.body.style.overflow = 'hidden';
     document.body.classList.add('modal-open');
+    if (typeof hideFooter === 'function') hideFooter();
   }
 
   // delegate clicks from cards/links that carry a page id
@@ -157,6 +161,7 @@ document.addEventListener("click", async (e) => {
     </div>
   `;
   lockScroll();
+  if (typeof hideFooter === 'function') hideFooter();
 
   try {
     const r = await fetch(`/release_json/${pageId}`);
@@ -182,6 +187,7 @@ document.addEventListener("click", async (e) => {
     function closeStreamModal(){
       root.innerHTML = '';
       unlockScroll();
+      if (typeof showFooter === 'function') showFooter();
     }
     backdropEl && backdropEl.addEventListener('click', closeStreamModal);
     closeEls.forEach(el => el.addEventListener('click', closeStreamModal));
@@ -525,7 +531,7 @@ document.addEventListener("click", async (e) => {
         </div>
       </div>
     `;
-    const cleanup = () => { root.innerHTML = ""; };
+    const cleanup = () => { root.innerHTML = ""; if (typeof showFooter === 'function') showFooter(); };
     root.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', cleanup));
   }
 });
@@ -543,6 +549,7 @@ document.addEventListener('click', (e) => {
     if (root && root.contains(modal)) root.innerHTML = '';
     if (document.body.dataset.scrollLocked) document.body.style.overflow = '';
     document.body.classList.remove('modal-open');
+    if (typeof showFooter === 'function') showFooter();
     delete document.body.dataset.scrollLocked;
   }
 });
