@@ -891,7 +891,7 @@ button:focus-visible,
 ::-webkit-scrollbar-track{ background:#0e0e0e; }
 ::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:8px; border:2px solid #0e0e0e; }
 ::-webkit-scrollbar-thumb:hover{ background:#383838; }
-/* === Accent Glow (minimal) — subtle outline on hover/focus === */
+/* === Accent Glow (slightly stronger) === */
 :root { --accent-rgb: 167,139,250; }
 
 .nav-link:hover,
@@ -908,8 +908,8 @@ button:focus-visible,
 .video-card:focus-visible,
 .card:hover,
 .card:focus-visible {
-  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), .05);
-  border-color: rgba(var(--accent-rgb), .06) !important;
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), .09);
+  border-color: rgba(var(--accent-rgb), .12) !important;
 }
 
 /* subtle text accent on active items */
