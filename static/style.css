@@ -790,8 +790,8 @@ body {
   }
 
   #stream-modal-root .platforms {
-    padding-left: 34px;
-    margin-left: 4px;
+    padding-left: 42px; /* increased left padding for better icon visibility */
+    margin-left: 8px;   /* shift slightly further right */
     overflow: visible !important;
   }
 
