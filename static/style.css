@@ -733,17 +733,6 @@ body {
 /* --- Mobile fixes for stream modal (icons clipping & dialog width) --- */
 @media (max-width: 640px) {
   /* Тримай діалог всередині екрана з невеликими полями */
-  #stream-modal-root .modal {
-    padding-left: max(14px, env(safe-area-inset-left));
-    padding-right: max(14px, env(safe-area-inset-right));
-    overflow-x: hidden;               /* no horizontal scroll */
-    overflow-y: auto;                 /* allow vertical scroll */
-    overscroll-behavior: contain;     /* prevent rubber-band pushing content */
-    touch-action: pan-y;              /* only vertical panning */
-    min-height: 100dvh;               /* account for dynamic mobile UI */
-    padding-bottom: 24px;             /* extra space so last item never hides */
-  }
-
   #stream-modal-root .modal-dialog {
     width: 96vw;
     max-width: 640px;
@@ -751,28 +740,30 @@ body {
     box-sizing: border-box;
     padding-left: max(16px, env(safe-area-inset-left));
     padding-right: max(16px, env(safe-area-inset-right));
-    overflow: visible !important;     /* allow icons/shadows to be fully visible */
-    padding-bottom: 14px;             /* breathing room at the bottom */
+  }
+
+  #stream-modal-root .modal {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
   }
 
   /* Список лінків не обрізається і займає всю ширину */
   #stream-modal-root .platforms {
     width: 100%;
     max-height: none;
-    overflow: visible;                /* do not clip rows */
-    padding-left: 42px;               /* keep icons fully visible when swiping */
-    margin-left: 8px;                 /* shift slightly away from the edge */
-    padding-bottom: 48px;             /* ensure last row stays above iOS toolbar */
-    scroll-padding-bottom: 48px;      /* also for keyboard/UA overlays */
+    overflow: visible;
+    padding-left: 26px;
   }
 
   /* Більша tap-ціль і без обрізання контенту */
   #stream-modal-root .platform-row {
-    overflow: visible !important;
-    min-height: 38px;                 /* compact stripes */
-    padding: 6px 12px;                /* tight vertical spacing */
-    margin-bottom: 6px;               /* small gap so the last button isn't glued to the edge */
-    line-height: 1.25;
+    min-height: 48px;       /* трохи більше місця */
+    padding: 12px 18px;
+    line-height: 1.3;
   }
 
   /* Іконки — з запасом і без обрізання */
@@ -784,5 +775,39 @@ body {
     align-items: center;
     justify-content: center;
     overflow: visible;
+  }
+
+  #stream-modal-root .platform-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  /* --- Inserted: Reduce platform-row height & prevent icon clipping --- */
+  #stream-modal-root .modal-dialog {
+    overflow: visible !important;
+  }
+
+  #stream-modal-root .platforms {
+    padding-left: 42px; /* increased left padding for better icon visibility */
+    margin-left: 8px;   /* shift slightly further right */
+    overflow: visible !important;
+  }
+
+  #stream-modal-root .platform-row {
+    overflow: visible !important;
+    min-height: 38px; /* lower stripes height */
+    padding: 6px 12px; /* tighter spacing */
+  }
+
+  #stream-modal-root .modal {
+    overflow-x: visible !important;
+    overscroll-behavior: contain;
+  }
+
+  /* Збільшуємо внутрішній відступ зліва для кожного рядка */
+  #stream-modal-root .platform-row {
+    padding-left: 36px !important; /* трохи більше, щоб іконки не обрізались при свайпі */
   }
 }
