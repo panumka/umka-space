@@ -9,10 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
   
     const show = () => {
       modal.classList.add("show");
+      document.body.classList.add("modal-open");
     };
-  
+
     const hide = () => {
       modal.classList.remove("show");
+      document.body.classList.remove("modal-open");
     };
   
     open.addEventListener("click", show);
@@ -32,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(!overlay) return;
     overlay.remove();
     document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
   }
 
   function openModalWithHTML(title, date, html){
@@ -75,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = document.getElementById('post-modal-root') || document.body;
     root.appendChild(overlay);
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
   }
 
   // delegate clicks from cards/links that carry a page id
@@ -140,8 +144,8 @@ document.addEventListener("click", async (e) => {
   })();
 
   // scroll lock helpers
-  const lockScroll = () => { document.body.dataset.scrollLocked = '1'; document.body.style.overflow = 'hidden'; };
-  const unlockScroll = () => { delete document.body.dataset.scrollLocked; document.body.style.overflow = ''; };
+  const lockScroll = () => { document.body.dataset.scrollLocked = '1'; document.body.style.overflow = 'hidden'; document.body.classList.add('modal-open'); };
+  const unlockScroll = () => { delete document.body.dataset.scrollLocked; document.body.style.overflow = ''; document.body.classList.remove('modal-open'); };
 
   // loading state
   root.innerHTML = `
@@ -538,6 +542,8 @@ document.addEventListener('click', (e) => {
     const root = document.getElementById('stream-modal-root') || document.body;
     if (root && root.contains(modal)) root.innerHTML = '';
     if (document.body.dataset.scrollLocked) document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
+    delete document.body.dataset.scrollLocked;
   }
 });
 // --- /Stream Modal FETCH ------------------------------------------------------
