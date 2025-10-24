@@ -310,9 +310,19 @@ def fetch_notion_posts(limit: int = 20):
             if files_list:
                 f = files_list[0]
                 if f.get("type") == "external":
-                    thumb = (f.get("external") or {}).get("url")
+                    candidate = (f.get("external") or {}).get("url")
                 elif f.get("type") == "file":
-                    thumb = (f.get("file") or {}).get("url")
+                    candidate = (f.get("file") or {}).get("url")
+                else:
+                    candidate = None
+                # If candidate looks like a direct image, use it; otherwise try to extract og:image
+                if candidate:
+                    lower = candidate.lower()
+                    if lower.endswith((".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".avif", ".heic", ".heif")):
+                        thumb = candidate
+                    else:
+                        og = get_og_image(candidate)
+                        thumb = og or candidate
         if not thumb:
             cover_obj = r.get("cover")
             if cover_obj:
