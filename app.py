@@ -322,7 +322,7 @@ def fetch_notion_posts(limit: int = 20):
                         thumb = candidate
                     else:
                         og = get_og_image(candidate)
-                        thumb = og  # use OG image only; do not fall back to non-image page URL
+                        thumb = og or candidate
         if not thumb:
             cover_obj = r.get("cover")
             if cover_obj:
@@ -351,21 +351,6 @@ def fetch_notion_posts(limit: int = 20):
                 if og:
                     thumb = og
 
-        # Extract external URL (if present) to make the card clickable to that link
-        ext_url = None
-        for k in ("URL", "Url", "Link", "Посилання"):
-            p = props.get(k)
-            if isinstance(p, dict):
-                # Native URL property
-                ext_url = p.get("url") or ext_url
-                # Or rich_text fallback
-                if not ext_url:
-                    rts = p.get("rich_text") or []
-                    if rts:
-                        ext_url = "".join(t.get("plain_text", "") for t in rts).strip() or None
-            if ext_url:
-                break
-
         # Date display and sorting key
         date_iso = date
         date_display = date_iso
@@ -384,7 +369,6 @@ def fetch_notion_posts(limit: int = 20):
             "slug": slug,
             "excerpt": excerpt,
             "url": r.get("url"),
-            "ext_url": ext_url,
             "thumb": thumb,
         })
 
