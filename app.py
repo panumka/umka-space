@@ -560,6 +560,19 @@ def post_json(page_id: str):
         title = _rt_to_html(title_parts) or "Без назви"
         date = ((props.get("Date", {}) or {}).get("date") or {}).get("start")
 
+        # Extract external URL (URL/Url/Link/Посилання)
+        ext_url = None
+        for k in ("URL", "Url", "Link", "Посилання"):
+            p = props.get(k)
+            if isinstance(p, dict):
+                ext_url = p.get("url") or ext_url
+                if not ext_url:
+                    rts = p.get("rich_text") or []
+                    if rts:
+                        ext_url = "".join(t.get("plain_text", "") for t in rts).strip() or None
+            if ext_url:
+                break
+
         # 2) Blocks (paginate, up to a few pages)
         blocks = []
         cursor = None
@@ -611,7 +624,18 @@ def post_json(page_id: str):
                 f'loading="lazy" decoding="async"/></figure>'
             )
             html = cover_html + (html or "")
-        return jsonify(ok=True, title=title, date=date, html=html)
+
+        # If there is an external URL, render a link block near the top
+        if ext_url:
+            link_html = f'<p class="ext-link"><a href="{ext_url}" target="_blank" rel="noopener">🔗 Відкрити посилання</a></p>'
+            html = (html or "")
+            # Place the link just after cover (if present) or at the top otherwise
+            if 'cover' in locals() or cover_url:
+                html = link_html + html
+            else:
+                html = link_html + html
+
+        return jsonify(ok=True, title=title, date=date, html=html, ext_url=ext_url)
 
     except Exception as e:
         app.logger.error("[post_json] failed: %r", e)
