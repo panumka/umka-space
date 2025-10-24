@@ -272,7 +272,12 @@ def fetch_notion_posts(limit: int = 20):
 
         # Thumb: prefer Files & media (files), fallback to page cover
         thumb = None
-        files_prop = props.get("Files & media") or props.get("Files") or {}
+        files_prop = (
+            props.get("Files & media")
+            or props.get("Dateien und Medien")
+            or props.get("Files")
+            or {}
+        )
         if files_prop.get("type") == "files":
             files_list = files_prop.get("files", [])
             if files_list:
@@ -525,9 +530,14 @@ def post_json(page_id: str):
                 cover_url = (cover_obj.get("external") or {}).get("url")
             elif cover_obj.get("type") == "file":
                 cover_url = (cover_obj.get("file") or {}).get("url")
-        # Fallback to first file in Files & media / Files property
+        # Fallback to first file in Files & media / Dateien und Medien / Files property
         if not cover_url:
-            props_files = props.get("Files & media") or props.get("Files") or {}
+            props_files = (
+                props.get("Files & media")
+                or props.get("Dateien und Medien")
+                or props.get("Files")
+                or {}
+            )
             if props_files.get("type") == "files":
                 flist = props_files.get("files", [])
                 if flist:
@@ -583,6 +593,7 @@ def release_json(page_id: str):
             props.get("Cover")
             or props.get("Cover Art")
             or props.get("Files & media")
+            or props.get("Dateien und Medien")
             or props.get("Files")
             or {}
         )

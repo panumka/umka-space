@@ -20,10 +20,6 @@
             <a href="#" class="post-open" data-id="{{ p.id }}">
               <img src="/proxy_img?b={{ p.thumb | b64encode }}" alt="Превʼю: {{ p.title|e }}" class="thumb" loading="lazy" decoding="async" />
             </a>
-          {% else %}
-            <a href="#" class="post-open thumb thumb--empty" data-id="{{ p.id }}" aria-label="Відкрити нотатку «{{ p.title|e }}»">
-              Без превʼю
-            </a>
           {% endif %}
 
           <h3 class="title">
