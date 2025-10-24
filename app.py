@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, send_file, Response, jsonify
 import os
 import requests
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 from notion_client import Client
 import time
 
@@ -30,7 +31,33 @@ def _requests_session():
     s.mount("https://", HTTPAdapter(max_retries=retry))
     return s
 
+
 _REQ = _requests_session()
+
+# Helper: fetch og:image from a webpage (for use as a thumbnail)
+def get_og_image(url: str) -> str | None:
+    """Fetch the Open Graph image (og:image) for a given webpage URL.
+    Returns direct image URL or None if not found/failed.
+    Uses the shared retrying session and a short timeout.
+    """
+    if not url:
+        return None
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36'
+        }
+        r = _REQ.get(url, headers=headers, timeout=5)
+        if r.status_code != 200 or not (r.text or "").strip():
+            return None
+        soup = BeautifulSoup(r.text, "html.parser")
+        # Prefer og:image, but also try twitter:image as fallback
+        for prop, attr in (("og:image", "property"), ("twitter:image", "name")):
+            tag = soup.find("meta", {attr: prop})
+            if tag and tag.get("content"):
+                return tag.get("content").strip()
+    except Exception:
+        pass
+    return None
 
 
 load_dotenv(override=True)
@@ -293,6 +320,26 @@ def fetch_notion_posts(limit: int = 20):
                     thumb = (cover_obj.get("external") or {}).get("url")
                 elif cover_obj.get("type") == "file":
                     thumb = (cover_obj.get("file") or {}).get("url")
+        # If still no thumb, try to fetch og:image from a URL property (e.g., a YouTube link)
+        if not thumb:
+            url_prop = None
+            # Tolerant variants for the property name
+            for k in ("URL", "Url", "Link", "Посилання"):
+                p = props.get(k)
+                if isinstance(p, dict):
+                    # Native URL type
+                    url_prop = p.get("url") or url_prop
+                    # Or rich_text fallback
+                    if not url_prop:
+                        rts = p.get("rich_text") or []
+                        if rts:
+                            url_prop = "".join(t.get("plain_text", "") for t in rts).strip() or None
+                if url_prop:
+                    break
+            if url_prop:
+                og = get_og_image(url_prop)
+                if og:
+                    thumb = og
 
         # Date display and sorting key
         date_iso = date
