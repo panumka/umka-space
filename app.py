@@ -468,13 +468,13 @@ def fetch_stream_releases(limit: int = 24):
             ("youtube",      "YouTube"),
         ]
         links = []
-        # Try name variants to be tolerant (e.g., property might be named "Spotify" or "spotify")
+        # Case-insensitive match for platform keys/labels in property names
         for key, label in platforms_spec:
-            for variant in (key, key.capitalize(), label):
-                url = _prop_url(props, variant)
+            match_key = next((k for k in props.keys() if k.lower() == key.lower() or k.lower() == label.lower()), None)
+            if match_key:
+                url = _prop_url(props, match_key)
                 if url:
                     links.append({"key": key, "label": label, "url": url})
-                    break
 
         items.append({
             "id": r.get("id"),
@@ -717,11 +717,11 @@ def release_json(page_id: str):
         ]
         links = []
         for key, label in platforms_spec:
-            for variant in (key, key.capitalize(), label):
-                url = _prop_url(props, variant)
+            match_key = next((k for k in props.keys() if k.lower() == key.lower() or k.lower() == label.lower()), None)
+            if match_key:
+                url = _prop_url(props, match_key)
                 if url:
                     links.append({"key": key, "label": label, "url": url})
-                    break
 
         # Build HTML (cover left + links right)
         cover_html = ""
