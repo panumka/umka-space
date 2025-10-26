@@ -7,7 +7,7 @@ from notion_client import Client
 import time
 
 import io
-from urllib.parse import unquote, unquote_plus
+from urllib.parse import unquote, unquote_plus, urlparse
 from PIL import Image
 # Safety: guard against decompression-bomb attacks in Pillow
 Image.MAX_IMAGE_PIXELS = int(os.environ.get("UMKA_MAX_IMAGE_PIXELS", "30000000"))  # default 30M px
@@ -58,6 +58,22 @@ def get_og_image(url: str) -> str | None:
     except Exception:
         pass
     return None
+
+# --- Helper: favicon from URL using DuckDuckGo service ---
+def _favicon_from_url(url: str) -> str | None:
+    """
+    Return a favicon URL for the given page URL using DuckDuckGo's favicon service.
+    Works for most domains (spotify, music.apple.com, music.youtube.com, deezer.com, amazon, etc.).
+    """
+    if not url:
+        return None
+    try:
+        host = urlparse(url).hostname
+        if not host:
+            return None
+        return f"https://icons.duckduckgo.com/ip3/{host}.ico"
+    except Exception:
+        return None
 
 
 load_dotenv(override=True)
@@ -474,7 +490,7 @@ def fetch_stream_releases(limit: int = 24):
             if match_key:
                 url = _prop_url(props, match_key)
                 if url:
-                    links.append({"key": key, "label": label, "url": url})
+                    links.append({"key": key, "label": label, "url": url, "icon": _favicon_from_url(url)})
 
         items.append({
             "id": r.get("id"),
@@ -721,7 +737,7 @@ def release_json(page_id: str):
             if match_key:
                 url = _prop_url(props, match_key)
                 if url:
-                    links.append({"key": key, "label": label, "url": url})
+                    links.append({"key": key, "label": label, "url": url, "icon": _favicon_from_url(url)})
 
         # Build HTML (cover left + links right)
         cover_html = ""
