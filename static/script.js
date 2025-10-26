@@ -445,9 +445,9 @@ document.addEventListener("click", async (e) => {
             a.className = "platform-row";
             const k = keyFromLabel(label);
             const svg = ICON_SVGS[k] || '';
-            const iconHTML = icon
-              ? `<img class="platform-icon-img" src="${icon}" alt="${label}" loading="lazy" decoding="async">`
-              : `<span class="platform-icon" aria-hidden="true">${svg}</span>`;
+            const iconHTML = svg
+              ? `<span class="platform-icon" aria-hidden="true">${svg}</span>`
+              : (icon ? `<img class="platform-icon-img" src="${icon}" alt="${label}" loading="lazy" decoding="async">` : "");
             a.innerHTML = `
               ${iconHTML}
               <span class="platform-name">${label}</span>
