@@ -257,6 +257,15 @@ document.addEventListener("click", async (e) => {
             width:100%;
             height:100%;
           }
+          .stream-modal .platform-icon-img{
+            width:16px;
+            height:16px;
+            display:inline-block;
+            flex:0 0 16px;
+            border-radius:4px;
+            object-fit:contain;
+            background:#222;
+          }
           .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
           @media (max-width:640px){
@@ -287,6 +296,11 @@ document.addEventListener("click", async (e) => {
               width: 22px;
               height: 22px;
               flex: 0 0 22px;
+            }
+            .stream-modal .platform-icon-img{
+              width:22px;
+              height:22px;
+              flex:0 0 22px;
             }
           }
         `;
@@ -425,14 +439,17 @@ document.addEventListener("click", async (e) => {
           }
 
           // renderer that keeps label EXACTLY as provided from Notion
-          function renderRow(label, url){
+          function renderRow(label, url, icon){
             const a = document.createElement("a");
             a.href = url; a.target = "_blank"; a.rel = "noopener";
             a.className = "platform-row";
             const k = keyFromLabel(label);
             const svg = ICON_SVGS[k] || '';
+            const iconHTML = icon
+              ? `<img class="platform-icon-img" src="${icon}" alt="${label}" loading="lazy" decoding="async">`
+              : `<span class="platform-icon" aria-hidden="true">${svg}</span>`;
             a.innerHTML = `
-              <span class="platform-icon" aria-hidden="true">${svg}</span>
+              ${iconHTML}
               <span class="platform-name">${label}</span>
             `;
             linksContainer.appendChild(a);
@@ -449,7 +466,7 @@ document.addEventListener("click", async (e) => {
               const url   = normalizeUrl(it.url || it.href);
               const label = (it.label || it.name || "").toString().trim();
               if (!label || !isProbablyUrl(url)) return;
-              renderRow(label, url);
+              renderRow(label, url, (it.icon || it.favicon));
               rendered++;
             });
           }
