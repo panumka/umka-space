@@ -481,6 +481,7 @@ def fetch_stream_releases(limit: int = 24):
             ("deezer",       "Deezer"),
             ("amazon",       "Amazon Music"),
             ("itunes",       "iTunes"),
+            ("bandcamp",     "Bandcamp"),
             ("soundcloud",   "SoundCloud"),
             ("youtube",      "YouTube"),
         ]
@@ -730,6 +731,7 @@ def release_json(page_id: str):
             ("deezer",       "Deezer"),
             ("amazon",       "Amazon Music"),
             ("itunes",       "iTunes"),
+            ("bandcamp",     "Bandcamp"),
             ("soundcloud",   "SoundCloud"),
             ("youtube",      "YouTube"),
         ]
