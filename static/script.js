@@ -258,14 +258,15 @@ document.addEventListener("click", async (e) => {
             height:100%;
           }
           .stream-modal .platform-icon-img{
-            width:16px;
-            height:16px;
-            display:inline-block;
-            flex:0 0 16px;
-            border-radius:4px;
-            object-fit:contain;
-            background:#222;
-          }
+  width:18px;
+  height:18px;
+  flex:0 0 18px;
+  display:inline-block;
+  object-fit:contain;
+  border-radius:4px;
+  background:transparent;
+  padding:0;
+}
           .stream-modal .platform-name{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
           @media (max-width:640px){
@@ -406,13 +407,21 @@ document.addEventListener("click", async (e) => {
                 <rect x="1" y="5" width="22" height="14" rx="4" fill="#FF0033"/>
                 <polygon points="10,9 16,12 10,15" fill="#fff"/>
               </svg>`,
-            'deezer': `
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="2" y="14" width="4" height="4" fill="#22D1EE"/>
-                <rect x="7" y="12" width="4" height="6" fill="#7C4DFF"/>
-                <rect x="12" y="10" width="4" height="8" fill="#FFAA00"/>
-                <rect x="17" y="8" width="4" height="10" fill="#00E676"/>
-              </svg>`
+           'deezer': `
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="2" y="14" width="4" height="4" fill="#22D1EE"/>
+    <rect x="7" y="12" width="4" height="6" fill="#7C4DFF"/>
+    <rect x="12" y="10" width="4" height="8" fill="#FFAA00"/>
+    <rect x="17" y="8"  width="4" height="10" fill="#00E676"/>
+  </svg>`,
+'bandcamp': `
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path fill="#629AA9" d="M3 17h8.7L21 7H12.3L3 17z"/>
+  </svg>`,
+'soundcloud': `
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path fill="#FF7700" d="M18.5 10.2c-.5 0-1 .1-1.4.3-.3-2.1-2.1-3.7-4.2-3.7-1 0-1.9.3-2.6.9-.2.2-.3.4-.3.7v6.9h8.5c1.6 0 2.9-1.3 2.9-2.9s-1.3-2.9-2.9-2.9zM2.9 11.3H4V15H2.9v-3.7zm1.9-1H6v5.7H4.8V10.3zm1.9-.6H8v6.3H6.7В9.7zm1.9-.6h1.2v6.9H8.6В9.1zm1.9-.4h1.2v7.3h-1.2В8.7з"/>
+  </svg>`
           };
           function keyFromLabel(label){
             return String(label || '').trim().toLowerCase();
