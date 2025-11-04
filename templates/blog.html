@@ -57,22 +57,16 @@
     .pink-link:hover {
       color: #ffc0cb;
     }
-    .post-modal-content {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 24px;
-    }
-
-    .post-modal-content img {
-      max-width: 45%;
+    #post-modal-root img {
+      max-width: 40%;
       height: auto;
       border-radius: 8px;
+      float: left;
+      margin: 0 24px 16px 0;
     }
 
-    .post-modal-text {
-      flex: 1;
-      max-width: 50%;
+    #post-modal-root .post-text, #post-modal-root p {
+      overflow: hidden;
     }
   </style>
 {% endblock %}
