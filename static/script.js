@@ -581,13 +581,19 @@ document.addEventListener('click', (e) => {
 });
 // --- /Stream Modal FETCH ------------------------------------------------------
 // === Footer hide/show on modal open/close ===
-const footer = document.querySelector('footer');
+const FOOTER_SELECTOR = 'footer.site-footer, .site-footer, footer';
+
+function getFooterEl() {
+  return document.querySelector(FOOTER_SELECTOR);
+}
 
 function hideFooter() {
+  const footer = getFooterEl();
   if (footer) footer.style.display = 'none';
 }
 
 function showFooter() {
+  const footer = getFooterEl();
   if (footer) footer.style.display = '';
 }
 
