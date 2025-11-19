@@ -443,9 +443,21 @@ html, body {
     margin: 0 auto;
     padding: 16px;
     gap: 10px;
-    max-height: calc(100vh - 32px);  /* never taller than screen */
-    overflow-y: auto;                /* scroll inside dialog if needed */
+    /* max-height: calc(100vh - 32px);  never taller than screen */
+    /* overflow-y: auto;                scroll inside dialog if needed */
+    max-height: none !important;
+    overflow-y: visible !important;
     box-sizing: border-box;
+  }
+
+  #stream-modal-root .modal {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  body.modal-open {
+    overflow-y: auto !important;
+    height: auto !important;
   }
 
   #stream-modal-root .modal-body {
