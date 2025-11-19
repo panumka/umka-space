@@ -304,8 +304,6 @@ html, body {
   justify-content: flex-start;
   gap: 6px;
   width: 100%;
-  max-height: none;         /* повна висота контенту */
-  overflow-y: visible;      /* без внутрішнього скролу */
 }
 
 /* кожен рядок платформи */
@@ -425,14 +423,13 @@ html, body {
 }
 
 @media (max-width: 700px) {
-  /* make the modal full-screen overlay on mobile */
+  /* make the modal attach to the top and allow vertical scroll inside */
   #stream-modal-root .modal {
-    position: fixed;
-    inset: 0;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 16px 8px;
-    overflow: hidden;   /* no scroll on the container itself */
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   /* dialog becomes a column that can scroll if taller than the viewport */
@@ -444,12 +441,17 @@ html, body {
     margin: 0 auto;
     padding: 16px;
     gap: 10px;
-    max-height: calc(100vh - 32px);  /* never taller than screen */
-    overflow-y: auto;                /* scroll inside dialog if needed */
+    /* max-height: calc(100vh - 32px);  never taller than screen */
+    /* overflow-y: auto;                scroll inside dialog if needed */
+    max-height: none !important;
+    overflow-y: visible !important;
     box-sizing: border-box;
   }
 
-
+  #stream-modal-root .modal {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 
 
   #stream-modal-root .modal-body {
@@ -859,6 +861,17 @@ body.accent-strong .card:hover {
 
 @media (max-width: 640px){
   body::before{ opacity:.05; background-size: 180px 180px; }
+
+  /* --- Mobile fixes for stream modal (icons clipping & dialog width) --- */
+  #stream-modal-root .modal {
+    overflow-y: auto;
+  }
+
+  #stream-modal-root .platforms {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 /* Prevent background scroll when a modal is open */
 html.modal-open,
