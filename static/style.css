@@ -703,56 +703,53 @@ html, body {
   letter-spacing:.2px;
 }
 
-/* keep the dialog nicely centered on all screens */
-#stream-modal-root .modal{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:100vh;
-  overflow:auto;
-}
-
-#stream-modal-root .modal-dialog{
-  margin: auto;                 /* center inside flex container */
-  width: clamp(320px, 88vw, 680px);
-}
-/* --- Mobile fixes for stream modal (icons clipping & dialog width) --- */
+/* --- Mobile layout for stream modal (simplified) --- */
 @media (max-width: 640px) {
-  /* Тримай діалог всередині екрана з невеликими полями */
   #stream-modal-root .modal {
-    padding: 16px 0 24px;            /* невеликий відступ зверху/знизу */
+    padding: 12px;
+    align-items: flex-start;
+    justify-content: center;
     overflow-x: hidden;
-    overflow-y: auto;                /* дозволяємо вертикальний скрол усій модалці */
+    overflow-y: auto;
     overscroll-behavior: contain;
     touch-action: pan-y;
-    align-items: flex-start;         /* притискаємо діалог до верху екрана */
-    justify-content: center;
   }
 
   #stream-modal-root .modal-dialog {
-    width: 100vw;                    /* рівно по ширині екрана */
-    max-width: 100vw;
-    margin: 0;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
     box-sizing: border-box;
-    padding: 12px 16px 20px;         /* трохи менше зверху/знизу */
-    border-radius: 0;
+    padding: 14px;
+    border-radius: 12px;
   }
 
-  /* Список лінків не обрізається і займає всю ширину */
+  #stream-modal-root .modal-body {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    padding: 4px 0 0;
+    min-height: auto;
+  }
+
+  #stream-modal-root .modal-body img {
+    width: 68vw;
+    max-width: 240px;
+    height: auto;
+    margin: 0 auto 8px;
+    flex: 0 0 auto;
+  }
+
   #stream-modal-root .platforms {
     width: 100%;
-    padding-left: 12px;              /* менший відступ, щоб не створювати зайву ширину */
-    padding-right: 12px;
-    max-height: none !important;     /* така ж повна висота і на мобілці */
-    overflow-y: visible !important;  /* без окремого скролу всередині списку */
+    padding-left: 0;
+    padding-right: 0;
   }
 
-  /* Єдиний мобільний стиль для platform-row */
   #stream-modal-root .platform-row {
-    min-height: 36px !important;
-    padding: 6px 12px !important;
-    padding-left: 36px !important;
-    line-height: 1.2;
+    min-height: 30px !important;
+    padding: 4px 12px !important;
   }
 }
 /* === Visual polish pack (non-breaking enhancements) === */
