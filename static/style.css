@@ -11,11 +11,15 @@ body {
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
   margin: 0;
+  min-height: 100vh;          /* тягнемо фон на всю висоту екрана */
+  display: flex;              /* робимо сторінку колонкою */
+  flex-direction: column;     /* хедер зверху, контент посередині, футер знизу */
 }
 
 html, body {
   max-width: 100%;
   overflow-x: hidden;
+  height: 100%;              /* потрібно для min-height:100vh + flex */
 }
 
 .container {
@@ -72,7 +76,10 @@ html, body {
 .nav-link:hover,
 .nav-link.active { color: var(--text); background: var(--card); }
 
-.content { padding: 32px 0; }
+.content {
+  padding: 32px 0;
+  flex: 1 0 auto;            /* контент розтягується, пушить футер вниз */
+}
 
 /* Центрований герой-блок на головній */
 .hero{display:flex;flex-direction:column;align-items:center;gap:16px;margin:24px 0}
@@ -151,7 +158,14 @@ html, body {
 .platforms a { display: block; color: var(--text); text-decoration: none; padding: 12px; border-radius: 12px; background: #121212; margin: 8px 0; }
 .platforms a:hover { background: #181818; }
 
-.site-footer { border-top: 1px solid var(--border); color: var(--muted); text-align: center; padding: 18px 0; }
+.site-footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  text-align: center;
+  padding: 18px 0;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom)); /* разом із нижньою полоскою на iPhone */
+  margin-top: auto;           /* притискаємо футер до низу сторінки */
+}
 
 /* --- PANAMABATTLE grid (centered) --- */
 .video-grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(360px,720px));justify-content:center;align-items:start;margin:16px auto 0}
