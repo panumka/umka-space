@@ -422,55 +422,6 @@ html, body {
   border-color: rgba(255,255,255,0.2);
 }
 
-@media (max-width: 700px) {
-  /* make the modal attach to the top and allow vertical scroll inside */
-  #stream-modal-root .modal {
-    align-items: flex-start;
-    justify-content: center;
-    padding: 16px 8px;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  /* dialog becomes a column that can scroll if taller than the viewport */
-  #stream-modal-root .modal-dialog {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-    padding: 16px;
-    gap: 10px;
-    /* max-height: calc(100vh - 32px);  never taller than screen */
-    /* overflow-y: auto;                scroll inside dialog if needed */
-    max-height: none !important;
-    overflow-y: visible !important;
-    box-sizing: border-box;
-  }
-
-  #stream-modal-root .modal {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-
-  #stream-modal-root .modal-body {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    width: 100%;
-    padding: 0;
-    min-height: auto;
-  }
-
-  #stream-modal-root .modal-body img {
-    width: 70vw;             /* responsive cover */
-    max-width: 220px;
-    height: auto;
-    margin: 0 auto 8px;
-    flex: 0 0 auto;
-  }
-}
 /* === UmkA Releases section (cards on home) === */
 .release-grid {
   display: flex;
@@ -686,8 +637,9 @@ html, body {
     inset: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-    overflow: hidden !important;       /* block scrolling of main page */
-    touch-action: none !important;     /* prevent vertical swipe on background */
+    overflow-y: auto !important;       /* allow vertical scroll inside modal */
+    overflow-x: hidden !important;     /* prevent horizontal scroll */
+    touch-action: pan-y !important;    /* vertical pan only, no side-swipe */
     z-index: 99999 !important;         /* ensure modal is above everything */
 }
 
