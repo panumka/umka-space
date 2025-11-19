@@ -252,14 +252,14 @@ document.addEventListener("click", async (e) => {
             display:flex;
             align-items:center;
             gap:10px;
-            padding:8px 12px;      /* slightly taller than text, slimmer horizontally */
+            padding:6px 10px;      /* slightly taller than text, slimmer horizontally */
             background:#151515;
             border:1px solid #222;
-            border-radius:12px;
+            border-radius:10px;
             text-decoration:none;
             color:#ddd;
             font-size:0.95rem;
-            height:36px;           /* compact row so 6+ rows comfortably fit next to 400px cover */
+            height:34px;           /* compact row so 6+ rows comfortably fit next to 400px cover */
             line-height:1.2;
           }
           .stream-modal .platform-row:hover{ background:#181818; border-color:#2a2a2a; }
