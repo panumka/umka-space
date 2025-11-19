@@ -822,7 +822,7 @@ body::before{
   position: fixed;
   inset: -2rem;             /* slight bleed outside viewport edges */
   pointer-events: none;
-  z-index: 0;               /* sits under app content but above bg */
+  z-index: -1;              /* sits under app content but above bg */
   opacity: .035;            /* overall grain intensity */
   mix-blend-mode: overlay;  /* blend with dark background */
   background-size: 220px 220px; /* tile size */
