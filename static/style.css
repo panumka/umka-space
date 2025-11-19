@@ -100,9 +100,16 @@ html, body {
 .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); }
 
 .modal-dialog {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  background: var(--card); padding: 18px; border-radius: 16px; border: 1px solid var(--border);
+  position: static;
+  transform: none;
+  left: auto;
+  top: auto;
+  margin: 0;
   width: min(90vw, 540px);
+  background: var(--card);
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
 }
 
 .modal-content {
@@ -247,6 +254,15 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   touch-action: pan-y;
+  z-index: 99999 !important;
+}
+#stream-modal-root .modal::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+  z-index: -1;
 }
 
 #stream-modal-root .modal-dialog {
