@@ -862,3 +862,15 @@ html, body {
 body.modal-open .site-footer {
   display: none !important;
 }
+
+/* Fallback: якщо клас .modal-open не додався, блокуємо фон і ховаємо футер,
+   коли стрім‑модалка відкрита */
+body:has(#stream-modal-root .modal.show),
+html:has(#stream-modal-root .modal.show) {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+body:has(#stream-modal-root .modal.show) .site-footer {
+  display: none !important;
+}
