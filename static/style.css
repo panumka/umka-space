@@ -716,17 +716,6 @@ html, body {
   margin: auto;                 /* center inside flex container */
   width: clamp(320px, 88vw, 680px);
 }
-@media (max-width: 700px) {
-  #stream-modal-root .modal-body img {
-    width: 200px !important;
-    height: 200px !important;
-  }
-  #stream-modal-root .platform-row {
-    font-size: 0.8rem;
-    padding: 4px 10px;   /* така ж вузька геометрія */
-    min-height: 30px;
-  }
-}
 /* --- Mobile fixes for stream modal (icons clipping & dialog width) --- */
 @media (max-width: 640px) {
   /* Тримай діалог всередині екрана з невеликими полями */
