@@ -256,14 +256,6 @@ html, body {
   touch-action: pan-y;
   z-index: 99999 !important;
 }
-#stream-modal-root .modal::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(6px);
-  z-index: -1;
-}
 
 #stream-modal-root .modal-dialog {
   background: #111;
@@ -799,7 +791,7 @@ button:focus-visible,
 body::before{
   content:"";
   position: fixed;
-  inset: -2rem;             /* slight bleed outside viewport edges */
+  inset: 0;                 /* lock to viewport to avoid horizontal scroll */
   pointer-events: none;
   z-index: -1;              /* sits under app content but above bg */
   opacity: .035;            /* overall grain intensity */
