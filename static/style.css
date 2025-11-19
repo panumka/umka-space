@@ -661,16 +661,7 @@ body {
 }
 
 #stream-modal-root .platform-row{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:6px 12px;          /* вужчі смужки */
-  min-height:36px;           /* однакова висота для всіх платформ */
-  border-radius:10px;
-  background: rgba(0,0,0,0.45);
-  border:1px solid rgba(255,255,255,0.08);
-  font-size:0.85rem;
-  transition: background .2s ease, border-color .2s ease, transform .12s ease;
+  backdrop-filter: blur(2px);
 }
 
 #stream-modal-root .platform-row:hover{
