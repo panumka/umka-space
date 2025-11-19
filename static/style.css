@@ -680,6 +680,26 @@ html, body {
     font-size: 12px;
   }
 }
+/* === FIX: Lock stream modal to viewport and prevent background scroll === */
+#stream-modal-root .modal {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;       /* block scrolling of main page */
+    touch-action: none !important;     /* prevent vertical swipe on background */
+    z-index: 99999 !important;         /* ensure modal is above everything */
+}
+
+#stream-modal-root .modal-dialog {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;       /* scroll only inside the dialog */
+}
+
 /* === Stream Modal: UnitedMasters-like stripes === */
 #stream-modal-root .platforms a{
   background: transparent !important;
