@@ -425,13 +425,14 @@ html, body {
 }
 
 @media (max-width: 700px) {
-  /* make the modal attach to the top and allow vertical scroll inside */
+  /* make the modal full-screen overlay on mobile */
   #stream-modal-root .modal {
-    align-items: flex-start;
+    position: fixed;
+    inset: 0;
+    align-items: center;
     justify-content: center;
     padding: 16px 8px;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;   /* no scroll on the container itself */
   }
 
   /* dialog becomes a column that can scroll if taller than the viewport */
@@ -443,17 +444,12 @@ html, body {
     margin: 0 auto;
     padding: 16px;
     gap: 10px;
-    /* max-height: calc(100vh - 32px);  never taller than screen */
-    /* overflow-y: auto;                scroll inside dialog if needed */
-    max-height: none !important;
-    overflow-y: visible !important;
+    max-height: calc(100vh - 32px);  /* never taller than screen */
+    overflow-y: auto;                /* scroll inside dialog if needed */
     box-sizing: border-box;
   }
 
-  #stream-modal-root .modal {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+
 
 
   #stream-modal-root .modal-body {
