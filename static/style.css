@@ -883,10 +883,6 @@ body.accent-strong .card:hover {
   body::before{ opacity:.05; background-size: 180px 180px; }
 
   /* --- Mobile fixes for stream modal (icons clipping & dialog width) --- */
-  #stream-modal-root .modal {
-    overflow-y: auto;
-  }
-
   #stream-modal-root .platforms {
     width: 100%;
     padding-left: 0;
