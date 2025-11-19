@@ -239,30 +239,35 @@ html, body {
   inset: 0;
   background: rgba(0, 0, 0, 0.96);
   display: flex;
-  align-items: center;       /* vertical center */
-  justify-content: center;   /* horizontal center */
-  min-height: 100vh;         /* ensure full viewport height */
-  padding: 16px;             /* small safe-area padding */
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
   z-index: 1000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
 }
 
 #stream-modal-root .modal-dialog {
   background: #111;
   border-radius: 14px;
-  max-width: 680px;                     /* was 800px */
-  width: clamp(320px, 92vw, 680px);     /* responsive width */
+  max-width: 680px;
+  width: clamp(320px, 92vw, 680px);
   display: flex;
   flex-direction: row;
   gap: 20px;
-  padding: 20px;                        /* a touch tighter */
+  padding: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-  position: relative;                   /* keep above backdrop */
+  position: relative;
   z-index: 1;
-  color: #e9e9e9;                       /* keep the brighter text */
+  color: #e9e9e9;
   left: auto;
   top: auto;
   transform: none;
-  margin: 0 auto; /* keep horizontally centered in the flex container */
+  margin: 0 auto;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 #stream-modal-root .modal-header {
@@ -630,26 +635,6 @@ html, body {
   .main-nav.stacked .nav-link span:last-child {
     font-size: 12px;
   }
-}
-/* === FIX: Lock stream modal to viewport and prevent background scroll === */
-#stream-modal-root .modal {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    overflow-y: auto !important;       /* allow vertical scroll inside modal */
-    overflow-x: hidden !important;     /* prevent horizontal scroll */
-    touch-action: pan-y !important;    /* vertical pan only, no side-swipe */
-    z-index: 99999 !important;         /* ensure modal is above everything */
-}
-
-#stream-modal-root .modal-dialog {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    max-height: 90vh !important;
-    overflow-y: auto !important;       /* scroll only inside the dialog */
 }
 
 /* === Stream Modal: UnitedMasters-like stripes === */
