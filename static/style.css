@@ -304,8 +304,8 @@ html, body {
   justify-content: flex-start;
   gap: 6px;
   width: 100%;
-  max-height: 70vh;         /* не вище 70% вікна */
-  overflow-y: auto;         /* скрол, якщо платформ багато */
+  max-height: none;         /* повна висота контенту */
+  overflow-y: visible;      /* без внутрішнього скролу */
 }
 
 /* кожен рядок платформи */
@@ -754,8 +754,8 @@ html, body {
     width: 100%;
     padding-left: 12px;              /* менший відступ, щоб не створювати зайву ширину */
     padding-right: 12px;
-    max-height: 70vh !important;
-    overflow-y: auto !important;
+    max-height: none !important;     /* така ж повна висота і на мобілці */
+    overflow-y: visible !important;  /* без окремого скролу всередині списку */
   }
 
   /* Єдиний мобільний стиль для platform-row */
