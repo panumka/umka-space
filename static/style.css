@@ -870,8 +870,13 @@ html, body {
   overflow-x: hidden !important;
 }
 
-/* While any modal is open, ховаємо футер (видна тільки модалка) */
-body.modal-open .site-footer {
+/* While any modal is open, ховаємо шапку і футер (видна тільки модалка) */
+body.modal-open .site-footer,
+body.modal-open footer,
+body.modal-open .page-footer,
+body.modal-open .footer,
+body.modal-open .copyright,
+body.modal-open .site-header {
   display: none !important;
 }
 
