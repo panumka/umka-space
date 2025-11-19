@@ -869,9 +869,10 @@ body.accent-strong .card:hover {
   body::before{ opacity:.05; background-size: 180px 180px; }
 }
 /* Prevent background scroll when a modal is open */
+html.modal-open,
 body.modal-open {
   overflow: hidden;
-  height: 100vh; /* iOS fix */
+  height: 100vh; /* iOS / mobile fix */
 }
 
 /* Also lock background scroll whenever a .modal.show is present */
