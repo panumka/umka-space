@@ -85,22 +85,27 @@ html, body {
 .hero{display:flex;flex-direction:column;align-items:center;gap:16px;margin:24px 0}
 
 .cover {
-  width: min(72vmin, 520px);
+  /* (intentionally left blank or add any shared styles if needed) */
+}
+
+.hero .cover {
+  width: min(420px, 80vw);
+  height: min(420px, 80vw);
   aspect-ratio: 1 / 1;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
   border-radius: 16px;
   border: 1px solid var(--border);
   background: radial-gradient(120% 120% at 0% 100%, #111 0%, #0a0a0a 50%, #000 100%);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
   box-shadow: 0 10px 30px rgba(0,0,0,.45) inset, 0 6px 30px rgba(0,0,0,.35);
 }
 
-/* Робимо героїчну обкладинку строго квадратною на головній */
-.hero .cover {
-  width: min(72vmin, 520px);
-  height: min(72vmin, 520px);
-  aspect-ratio: 1 / 1;
+.hero .cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .cover:focus{outline:2px solid #333; outline-offset:4px}
 .cover:hover .play-icon{transform:scale(1.03)}
