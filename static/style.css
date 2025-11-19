@@ -874,3 +874,18 @@ html:has(#stream-modal-root .modal.show) {
 body:has(#stream-modal-root .modal.show) .site-footer {
   display: none !important;
 }
+
+/* === TOTAL horizontal lock — nothing can escape viewport === */
+html, body,
+#stream-modal-root,
+#stream-modal-root .modal,
+#stream-modal-root .modal-dialog,
+#stream-modal-root .modal-body {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* Заборона створення нових контекстів, які видавлюють горизонталь */
+* {
+    box-sizing: border-box;
+}
