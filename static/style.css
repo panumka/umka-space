@@ -299,8 +299,8 @@ body {
   justify-content: flex-start;
   gap: 6px;
   width: 100%;
-  max-height: none;
-  /* дозволяє вмістити до 8 платформ без скролу */
+  max-height: 70vh;         /* не вище 70% вікна */
+  overflow-y: auto;         /* скрол, якщо платформ багато */
 }
 
 /* кожен рядок платформи */
@@ -308,7 +308,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -328,17 +328,6 @@ body {
   object-fit: cover;
   border-radius: 12px;
   flex: 0 0 auto;
-}
-
-#stream-modal-root .platforms {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  max-height: none;
 }
 
 #stream-modal-root .platforms a {
@@ -673,7 +662,8 @@ body {
   display:flex;
   align-items:center;
   gap:10px;
-  padding:8px 12px;
+  padding:6px 12px;          /* вужчі смужки */
+  min-height:36px;           /* однакова висота для всіх платформ */
   border-radius:10px;
   background: rgba(0,0,0,0.45);
   border:1px solid rgba(255,255,255,0.08);
@@ -761,8 +751,6 @@ body {
   /* Список лінків не обрізається і займає всю ширину */
   #stream-modal-root .platforms {
     width: 100%;
-    max-height: none;
-    overflow: visible;
     padding-left: 26px;
   }
 
@@ -799,7 +787,6 @@ body {
   #stream-modal-root .platforms {
     padding-left: 42px; /* increased left padding for better icon visibility */
     margin-left: 8px;   /* shift slightly further right */
-    overflow: visible !important;
   }
 
   #stream-modal-root .platform-row {

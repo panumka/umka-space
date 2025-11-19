@@ -793,7 +793,7 @@ def index():
     releases = fetch_stream_releases() if not need_streams_keys else []
     return render_template(
         'index.html',
-        title='UmkA — на музичних майданчиках',
+        title='UmkA тут',
         releases=releases,
         need_streams_keys=need_streams_keys,
     )
