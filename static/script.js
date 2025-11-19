@@ -10,12 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const show = () => {
       modal.classList.add("show");
       document.body.classList.add("modal-open");
+      document.documentElement.classList.add("modal-open");
       if (typeof hideFooter === 'function') hideFooter();
     };
 
     const hide = () => {
       modal.classList.remove("show");
       document.body.classList.remove("modal-open");
+      document.documentElement.classList.remove("modal-open");
       if (typeof showFooter === 'function') showFooter();
     };
   
@@ -36,7 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if(!overlay) return;
     overlay.remove();
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     document.body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
     if (typeof showFooter === 'function') showFooter();
   }
 
@@ -81,7 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = document.getElementById('post-modal-root') || document.body;
     root.appendChild(overlay);
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     document.body.classList.add('modal-open');
+    document.documentElement.classList.add('modal-open');
     if (typeof hideFooter === 'function') hideFooter();
   }
 
@@ -148,8 +154,20 @@ document.addEventListener("click", async (e) => {
   })();
 
   // scroll lock helpers
-  const lockScroll = () => { document.body.dataset.scrollLocked = '1'; document.body.style.overflow = 'hidden'; document.body.classList.add('modal-open'); };
-  const unlockScroll = () => { delete document.body.dataset.scrollLocked; document.body.style.overflow = ''; document.body.classList.remove('modal-open'); };
+  const lockScroll = () => {
+    document.body.dataset.scrollLocked = '1';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
+    document.documentElement.classList.add('modal-open');
+  };
+  const unlockScroll = () => {
+    delete document.body.dataset.scrollLocked;
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
+  };
 
   // loading state
   root.innerHTML = `
@@ -575,6 +593,7 @@ document.addEventListener('click', (e) => {
     if (root && root.contains(modal)) root.innerHTML = '';
     if (document.body.dataset.scrollLocked) document.body.style.overflow = '';
     document.body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
     if (typeof showFooter === 'function') showFooter();
     delete document.body.dataset.scrollLocked;
   }
@@ -597,19 +616,4 @@ function showFooter() {
   if (footer) footer.style.display = '';
 }
 
-// Якщо модалка керується кнопкою або подією відкриття
-document.addEventListener('openStreamModal', hideFooter);
-document.addEventListener('closeStreamModal', showFooter);
-
-// Якщо твій код відкриває модалку через клас або вручну
-const modalRoot = document.getElementById('stream-modal-root');
-if (modalRoot) {
-  const observer = new MutationObserver(() => {
-    if (modalRoot.classList.contains('active') || modalRoot.style.display === 'block') {
-      hideFooter();
-    } else {
-      showFooter();
-    }
-  });
-  observer.observe(modalRoot, { attributes: true, attributeFilter: ['class', 'style'] });
-}
+// (footer hide/show logic simplified and event/observer-based logic removed)
