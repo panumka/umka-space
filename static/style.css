@@ -901,3 +901,32 @@ html, body,
 * {
     box-sizing: border-box;
 }
+
+/* === Вирівнюємо висоту колонок картинка / платформи === */
+@media (min-width: 541px) {
+  /* тягнемо обидві колонки (картинка + платформи) на одну висоту */
+  #stream-modal-root .modal-body {
+    align-items: stretch;
+  }
+
+  /* квадратна обкладинка фіксованої висоти */
+  #stream-modal-root .modal-body img {
+    width: 320px !important;
+    height: 320px !important;
+    object-fit: cover;
+  }
+
+  /* колонка з платформами такої ж висоти, як картинка */
+  #stream-modal-root .platforms {
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* рівномірно розтягуємо рядки */
+    gap: 0; /* щоб не “з’їдати” висоту зайвими відступами */
+  }
+
+  /* кожна полоска тягнеться, щоб разом заповнити висоту */
+  #stream-modal-root .platform-row {
+    flex: 1 1 0;
+  }
+}
