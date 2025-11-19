@@ -425,29 +425,44 @@ html, body {
 }
 
 @media (max-width: 700px) {
+  /* make the modal attach to the top and allow vertical scroll inside */
+  #stream-modal-root .modal {
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* dialog becomes a column that can scroll if taller than the viewport */
   #stream-modal-root .modal-dialog {
     flex-direction: column;
-    align-items: center;
-    max-width: 520px;
-    width: 92%;
+    align-items: stretch;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
     padding: 16px;
-    gap: 14px;
+    gap: 10px;
+    max-height: calc(100vh - 32px);  /* never taller than screen */
+    overflow-y: auto;                /* scroll inside dialog if needed */
+    box-sizing: border-box;
   }
 
   #stream-modal-root .modal-body {
     flex-direction: column;
-    align-items: stretch;    /* розтягуємо контент на всю ширину */
-    gap: 10px;
+    align-items: stretch;
+    gap: 8px;
     width: 100%;
-    min-height: auto;        /* прибираємо жорсткий мінімальний розмір */
+    padding: 0;
+    min-height: auto;
   }
 
   #stream-modal-root .modal-body img {
-    width: 160px;   /* менша обкладинка, щоб було видно і платформи */
-    max-width: 160px;
+    width: 70vw;             /* responsive cover */
+    max-width: 220px;
     height: auto;
-    margin: 0 auto 6px;
-    flex: 0 0 160px;
+    margin: 0 auto 8px;
+    flex: 0 0 auto;
   }
 }
 /* === UmkA Releases section (cards on home) === */
@@ -703,55 +718,6 @@ html, body {
   letter-spacing:.2px;
 }
 
-/* --- Mobile layout for stream modal (simplified) --- */
-@media (max-width: 640px) {
-  #stream-modal-root .modal {
-    padding: 12px;
-    align-items: flex-start;
-    justify-content: center;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-  }
-
-  #stream-modal-root .modal-dialog {
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-    box-sizing: border-box;
-    padding: 14px;
-    border-radius: 12px;
-  }
-
-  #stream-modal-root .modal-body {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    width: 100%;
-    padding: 4px 0 0;
-    min-height: auto;
-  }
-
-  #stream-modal-root .modal-body img {
-    width: 68vw;
-    max-width: 240px;
-    height: auto;
-    margin: 0 auto 8px;
-    flex: 0 0 auto;
-  }
-
-  #stream-modal-root .platforms {
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  #stream-modal-root .platform-row {
-    min-height: 30px !important;
-    padding: 4px 12px !important;
-  }
-}
 /* === Visual polish pack (non-breaking enhancements) === */
 :root {
   --accent: #a78bfa;          /* violet accent */
