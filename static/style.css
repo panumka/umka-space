@@ -842,27 +842,11 @@ body.accent-strong .card:hover {
 html.modal-open,
 body.modal-open {
   overflow: hidden;
-  height: 100vh; /* iOS / mobile fix */
+  height: 100vh;           /* iOS / mobile fix */
+  overscroll-behavior: none; /* блокуємо swipe/scroll фону */
 }
 
-/* Also lock background scroll whenever a .modal.show is present */
-body:has(#stream-modal-root .modal.show),
-body:has(#post-modal-root .modal.show),
-body:has(.modal.show) {
-  overflow: hidden;
-  height: 100vh;
+/* While any modal is open, ховаємо футер (видна тільки модалка) */
+body.modal-open .site-footer {
+  display: none !important;
 }
-
-/* Hide footer while any modal is open */
-body.modal-open .site-footer { display: none !important; }
-
-/* Hide footer whenever any modal with .show is present (works even without body class) */
-body:has(#stream-modal-root .modal.show) .site-footer,
-body:has(#post-modal-root .modal.show) .site-footer,
-body:has(.modal.show) .site-footer { display: none !important; }
-
-/* Extra guard: hide footer whenever modal roots are populated */
-body:has(#stream-modal-root .modal) .site-footer,
-body:has(#post-modal-root .modal) .site-footer,
-body:has(#stream-modal-root:not(:empty)) .site-footer,
-body:has(#post-modal-root:not(:empty)) .site-footer { display: none !important; }
