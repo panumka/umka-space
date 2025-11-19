@@ -308,11 +308,13 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px;
+  padding: 4px 12px;          /* ще вужчі смужки */
+  min-height: 30px;           /* фіксована, нижча висота для всіх */
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.85rem;
+  line-height: 1.1;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
 }
 
@@ -724,7 +726,8 @@ body {
   }
   #stream-modal-root .platform-row {
     font-size: 0.8rem;
-    padding: 7px 10px;
+    padding: 4px 10px;   /* така ж вузька геометрія */
+    min-height: 30px;
   }
 }
 /* --- Mobile fixes for stream modal (icons clipping & dialog width) --- */
@@ -743,7 +746,7 @@ body {
     padding-left: max(14px, env(safe-area-inset-left));
     padding-right: max(14px, env(safe-area-inset-right));
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;          /* скролимо тільки всередині списку платформ */
     overscroll-behavior: contain;
     touch-action: pan-y;
   }
