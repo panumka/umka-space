@@ -874,6 +874,14 @@ body.modal-open {
   height: 100vh; /* iOS fix */
 }
 
+/* Also lock background scroll whenever a .modal.show is present */
+body:has(#stream-modal-root .modal.show),
+body:has(#post-modal-root .modal.show),
+body:has(.modal.show) {
+  overflow: hidden;
+  height: 100vh;
+}
+
 /* Hide footer while any modal is open */
 body.modal-open .site-footer { display: none !important; }
 
