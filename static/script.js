@@ -224,6 +224,30 @@ document.addEventListener("click", async (e) => {
       const styleEl = document.createElement("style");
       styleEl.id = 'stream-inline-css';
       styleEl.textContent = `
+          /* Backdrop uses release cover as blurred background (set via --cover) */
+          .modal-backdrop{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.65);
+            overflow:hidden;
+          }
+          .modal-backdrop::before{
+            content:"";
+            position:absolute;
+            inset:-20px;
+            background-image: var(--cover);
+            background-size: cover;
+            background-position: center;
+            filter: blur(28px);
+            transform: scale(1.08);
+            opacity: .55;
+          }
+          .modal-backdrop::after{
+            content:"";
+            position:absolute;
+            inset:0;
+            background: rgba(0,0,0,.55);
+          }
           .modal-dialog{ max-width: 780px; width: calc(100% - 24px); max-height: 90vh; overflow:auto; }
           .stream-modal{ padding: 16px; }
           .stream-modal .release-wrap{ display:flex; gap:16px; align-items:stretch; }
