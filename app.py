@@ -419,10 +419,6 @@ def fetch_stream_releases(limit: int = 24):
         resp = notion.databases.query(
             database_id=NOTION_STREAMS_DATABASE_ID,
             page_size=limit,
-            sorts=[
-                {"property": "Date", "direction": "descending"},
-                {"timestamp": "created_time", "direction": "descending"},
-            ],
         )
     except Exception as e:
         print("[Notion] streams query failed:", e)
@@ -443,7 +439,6 @@ def fetch_stream_releases(limit: int = 24):
     items = []
     for r in resp.get("results", []):
         props = r.get("properties", {})
-        created_time = (r.get("created_time") or "").strip()
 
         # Title (support both default "Name" and custom "Title")
         title_prop = props.get("Name") or props.get("Title") or {}
@@ -503,13 +498,12 @@ def fetch_stream_releases(limit: int = 24):
             "id": r.get("id"),
             "title": title,
             "date": date,
-            "created_time": created_time,
             "cover": cover,
             "links": links,
         })
 
-    # Sort by date (desc) when present, fallback to created_time
-    items.sort(key=lambda x: (x.get("date") or x.get("created_time") or ""), reverse=True)
+    # Sort by date (desc) when present
+    items.sort(key=lambda x: x.get("date") or "", reverse=True)
     return items
 
 # --- Notion helpers: rich text & blocks -> HTML for modal rendering ---
