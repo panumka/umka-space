@@ -502,8 +502,8 @@ def fetch_stream_releases(limit: int = 24):
             "links": links,
         })
 
-    # Sort by date (desc) when present
-    items.sort(key=lambda x: x.get("date") or "", reverse=True)
+    # Notion manual (drag&drop) order: last row = newest → show first
+    items = list(reversed(items))
     return items
 
 # --- Notion helpers: rich text & blocks -> HTML for modal rendering ---
