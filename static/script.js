@@ -606,26 +606,7 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-// Allow closing modal by clicking outside the dialog or on backdrop
-document.addEventListener('click', (e) => {
-  const target = e.target instanceof Element ? e.target : null;
-  if (target && target.closest('.release-card')) return;
-  const modal = document.querySelector('.modal');
-  if (!modal) return;
-  const dialog = modal.querySelector('.modal-dialog');
-  if (!dialog) return;
-  const clickedOutside = !dialog.contains(e.target);
-  const clickedBackdrop = e.target.classList.contains('modal-backdrop');
-  if (clickedOutside || clickedBackdrop) {
-    const root = document.getElementById('stream-modal-root') || document.body;
-    if (root && root.contains(modal)) root.innerHTML = '';
-    if (document.body.dataset.scrollLocked) document.body.style.overflow = '';
-    document.body.classList.remove('modal-open');
-    document.documentElement.classList.remove('modal-open');
-    if (typeof showFooter === 'function') showFooter();
-    delete document.body.dataset.scrollLocked;
-  }
-});
+// (Global outside-click close removed: modal-specific handlers already cover this)
 // --- /Stream Modal FETCH ------------------------------------------------------
 // === Footer hide/show on modal open/close ===
 const FOOTER_SELECTOR = 'footer.site-footer, .site-footer, footer';
