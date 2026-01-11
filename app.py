@@ -859,19 +859,6 @@ def index():
         need_streams_keys=need_streams_keys,
     )
 
-# Deep link: open release modal on load
-@app.route('/release/<page_id>')
-def release_page(page_id: str):
-    need_streams_keys = not (NOTION_API_KEY and NOTION_STREAMS_DATABASE_ID)
-    releases = fetch_stream_releases() if not need_streams_keys else []
-    return render_template(
-        'index.html',
-        title='UmkA тут',
-        releases=releases,
-        need_streams_keys=need_streams_keys,
-        release_id=page_id,
-    )
-
 # 🎤 Вкладка — UmkA на PANAMABATTLE
 @app.route('/panamabattle')
 def panamabattle():

@@ -135,7 +135,14 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 
 // --- Stream Modal (слухати на майданчиках) — FETCH FROM SERVER -----------------
-async function openReleaseModalById(pageId) {
+document.addEventListener("click", async (e) => {
+  const card = e.target.closest(".release-card");
+  if (!card) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
   if (!pageId) return;
 
   // ensure root exists
@@ -602,27 +609,6 @@ async function openReleaseModalById(pageId) {
     const cleanup = () => { root.innerHTML = ""; if (typeof showFooter === 'function') showFooter(); };
     root.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', cleanup));
   }
-});
-
-document.addEventListener("click", (e) => {
-  const card = e.target.closest(".release-card");
-  if (!card) return;
-  e.preventDefault();
-  e.stopPropagation();
-  const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
-  openReleaseModalById(pageId);
-});
-
-// Deep link: auto-open modal if release id is provided on <body>
-document.addEventListener("DOMContentLoaded", () => {
-  const rid = document.body && document.body.dataset ? document.body.dataset.releaseId : "";
-  if (!rid) return;
-  const card = document.querySelector(`.release-card[data-page-id="${rid}"], .release-card[data-id="${rid}"]`);
-  if (card) {
-    card.click();
-    return;
-  }
-  openReleaseModalById(rid);
 });
 
 // Allow closing modal by clicking outside the dialog or on backdrop
