@@ -251,7 +251,7 @@ async function openReleaseModal(pageId) {
           }
         }
         shareBtn.classList.add('copied');
-        setTimeout(() => shareBtn.classList.remove('copied'), 1200);
+        setTimeout(() => shareBtn.classList.remove('copied'), 1500);
       });
     }
 

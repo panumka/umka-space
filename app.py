@@ -827,9 +827,10 @@ def release_json(page_id: str):
         share_btn = (
             '<button type="button" class="rm-share" data-share aria-label="Поділитися">'
             '<svg viewBox="0 0 24 24" aria-hidden="true">'
-            '<path d="M8 3h8a2 2 0 0 1 2 2v6h-2V5H8v14h8v-6h2v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="currentColor"/>'
-            '<path d="M12 2l4 4h-3v7h-2V6H8l4-4z" fill="currentColor"/>'
+            '<path d="M12 3l4 4m-4-4l-4 4m4-4v11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+            '<path d="M5 10v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
             '</svg>'
+            '<span class="rm-share-label" aria-live="polite">Скопійовано</span>'
             '</button>'
         )
 
@@ -840,8 +841,8 @@ def release_json(page_id: str):
             '    <div class="rm-links">'
             '      <div class="rm-title-row">'
             f'        <h3 class="rm-title">{title}</h3>'
-            f'        {share_btn}'
             '      </div>'
+            f'      {share_btn}'
             '      <div class="rm-links-list">'
             f'        {"".join(links_html)}'
             '      </div>'
