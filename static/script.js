@@ -607,6 +607,7 @@ document.addEventListener("click", async (e) => {
 
 // Allow closing modal by clicking outside the dialog or on backdrop
 document.addEventListener('click', (e) => {
+  if (e.target.closest('.release-card')) return;
   const modal = document.querySelector('.modal');
   if (!modal) return;
   const dialog = modal.querySelector('.modal-dialog');
