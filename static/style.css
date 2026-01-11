@@ -455,8 +455,8 @@ html, body {
 }
 .rm-share {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: 0;
+  bottom: 0;
   width: 34px;
   height: 34px;
   border-radius: 10px;
