@@ -450,10 +450,14 @@ html, body {
   justify-content: space-between;
   gap: 12px;
 }
+.release-modal {
+  position: relative;
+}
 .rm-share {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -14px;
+  right: -14px;
+  z-index: 2;
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -498,10 +502,6 @@ html, body {
 .rm-share.copied .rm-share-label {
   opacity: 1;
   transform: translateY(0);
-}
-.rm-links {
-  position: relative;
-  padding-right: 42px;
 }
 
 /* адаптація під вузькі екрани: кладемо все в колонку */
