@@ -214,13 +214,14 @@ def get_terms():
     if raw:
         return [t.strip().lower() for t in raw.split(",") if t.strip()]
     # default terms (case-insensitive substring check)
-    return ["umka", "umk", "нішеві", "fremd"]
+    return ["umka", "umk", "нішеві", "fremd", "запоріжстайл"]
 
 
 def fetch_panamabattle_videos(max_results=50):
     """Fetch videos from PANAMABATTLE channel using YouTube Data API v3.
     Filters *titles only* for any of the terms from get_terms() (case-insensitive).
     Returns a list of dicts: id, title, published_at (YYYY-MM-DD), url, thumb.
+    Uses the uploads playlist to scan older videos beyond the first 150 search results.
     """
     API_KEY = os.environ.get("YOUTUBE_API_KEY", "").strip()
     channel_id = os.environ.get("PANAMABATTLE_CHANNEL_ID", "UC8zDVdKUnjs4E3FYGVIP0LQ").strip()
@@ -230,24 +231,42 @@ def fetch_panamabattle_videos(max_results=50):
         print("[YT API] missing API key or channel id")
         return []
 
-    base_url = "https://www.googleapis.com/youtube/v3/search"
     terms = [t.lower() for t in get_terms()]
+    max_pages = int(os.environ.get("UMKA_YT_MAX_PAGES", "20"))
+    max_scan = int(os.environ.get("UMKA_YT_MAX_SCAN", "1000"))
 
-    # We'll page through results a bit (YouTube returns up to 50 per page)
+    # Resolve uploads playlist id (cheaper and more complete than search)
+    uploads_id = None
+    try:
+        ch = _REQ.get(
+            "https://www.googleapis.com/youtube/v3/channels",
+            params={"key": API_KEY, "part": "contentDetails", "id": channel_id},
+            timeout=10,
+        )
+        if ch.status_code == 200:
+            data = ch.json() or {}
+            items = data.get("items") or []
+            if items:
+                uploads_id = (((items[0].get("contentDetails") or {}).get("relatedPlaylists") or {}).get("uploads"))
+    except Exception as e:
+        print("[YT API] channels failed:", e)
+
+    if not uploads_id:
+        print("[YT API] missing uploads playlist id")
+        return []
+
+    base_url = "https://www.googleapis.com/youtube/v3/playlistItems"
+    # We'll page through the uploads playlist (50 per page)
     page_token = None
     collected = {}
     fetched = 0
-    # Limit pages to avoid heavy quota usage (3 pages * 50 = 150 items scanned)
-    pages_left = 3
+    pages_left = max_pages
 
-    while pages_left > 0 and fetched < 500:  # hard ceiling guard
+    while pages_left > 0 and fetched < max_scan:  # hard ceiling guard
         params = {
             "key": API_KEY,
             "part": "snippet",
-            "channelId": channel_id,
-            # Note: We don't use `q` here so we read *all* latest and filter titles locally.
-            "type": "video",
-            "order": "date",
+            "playlistId": uploads_id,
             "maxResults": 50,
         }
         if page_token:
@@ -264,12 +283,9 @@ def fetch_panamabattle_videos(max_results=50):
             break
 
         for item in data.get("items", []):
-            kind = ((item.get("id") or {}).get("kind") or "")
-            if not kind.endswith("#video"):
-                continue
-
-            vid = (item.get("id") or {}).get("videoId") or ""
             sn = item.get("snippet") or {}
+            rid = sn.get("resourceId") or {}
+            vid = rid.get("videoId") or ""
             title = sn.get("title") or ""
             title_l = title.lower()
 
