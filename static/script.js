@@ -414,7 +414,7 @@ async function openReleaseModal(pageId) {
         }
         // try to find links container by common selectors or create one
         let linksBox = streamRoot.querySelector(".rm-links, .links, .platforms, .platform-links");
-        if (!streamRoot.querySelector(".release-wrap")) {
+        if (!streamRoot.querySelector(".release-wrap") && !streamRoot.querySelector(".rm-grid")) {
           const wrap = document.createElement("div");
           wrap.className = "release-wrap";
           // move cover + links into wrap if they exist
