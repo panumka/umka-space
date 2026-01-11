@@ -135,21 +135,51 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 
 // --- Stream Modal (слухати на майданчиках) — FETCH FROM SERVER -----------------
-function getReleaseFromHash() {
-  const m = (location.hash || "").match(/release=([^&]+)/);
-  return m ? decodeURIComponent(m[1]) : null;
+function slugifyReleaseTitle(title) {
+  if (!title) return "";
+  const map = {
+    а: "a", б: "b", в: "v", г: "h", ґ: "g", д: "d", е: "e", є: "ye",
+    ж: "zh", з: "z", и: "y", і: "i", ї: "yi", й: "y", к: "k", л: "l",
+    м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u",
+    ф: "f", х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch", ь: "",
+    ю: "yu", я: "ya",
+  };
+  let out = "";
+  for (const ch of String(title).trim()) {
+    const lower = ch.toLowerCase();
+    if (map[lower] !== undefined) {
+      out += map[lower];
+    } else if (/[a-z0-9]/i.test(ch)) {
+      out += lower;
+    } else {
+      out += "-";
+    }
+  }
+  return out
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
 }
 
-function setReleaseHash(pageId) {
-  if (!pageId) return;
-  history.pushState(null, "", `#release=${encodeURIComponent(pageId)}`);
+function getReleaseFromHash() {
+  const hash = (location.hash || "").replace(/^#/, "");
+  if (!hash) return null;
+  const m = hash.match(/^release=([^&]+)/);
+  if (m) return decodeURIComponent(m[1]);
+  return decodeURIComponent(hash);
+}
+
+function setReleaseHashFromTitle(title, fallbackId) {
+  const slug = slugifyReleaseTitle(title) || fallbackId || "";
+  if (!slug) return;
+  history.pushState(null, "", `#${encodeURIComponent(slug)}`);
 }
 
 function clearReleaseHash() {
   history.pushState(null, "", location.pathname + location.search);
 }
 
-async function openReleaseModal(pageId) {
+async function openReleaseModal(pageId, title) {
   if (!pageId) return;
 
   // ensure root exists
@@ -176,7 +206,7 @@ async function openReleaseModal(pageId) {
     document.documentElement.classList.remove('modal-open');
   };
 
-  setReleaseHash(pageId);
+  setReleaseHashFromTitle(title, pageId);
 
   // loading state
   root.innerHTML = `
@@ -658,13 +688,25 @@ document.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
   const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
-  openReleaseModal(pageId);
+  const title = card.dataset.title || "";
+  openReleaseModal(pageId, title);
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-  const releaseId = getReleaseFromHash();
-  if (!releaseId) return;
-  openReleaseModal(releaseId);
+  const slug = getReleaseFromHash();
+  if (!slug) return;
+  const cards = Array.from(document.querySelectorAll(".release-card"));
+  for (const card of cards) {
+    const title = card.dataset.title || "";
+    const cardSlug = slugifyReleaseTitle(title);
+    if (cardSlug && cardSlug === slug) {
+      const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
+      openReleaseModal(pageId, title);
+      return;
+    }
+  }
+  // fallback: treat hash as a direct page id
+  openReleaseModal(slug, "");
 });
 
 // Allow closing modal by clicking outside the dialog or on backdrop
