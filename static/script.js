@@ -136,13 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // --- Stream Modal (слухати на майданчиках) — FETCH FROM SERVER -----------------
 document.addEventListener("click", async (e) => {
-  const target = e.target instanceof Element ? e.target : null;
-  const card = target ? target.closest(".release-card") : null;
+  const card = e.target.closest(".release-card");
   if (!card) return;
 
   e.preventDefault();
   e.stopPropagation();
-  e.stopImmediatePropagation();
 
   const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
   if (!pageId) return;
@@ -173,7 +171,7 @@ document.addEventListener("click", async (e) => {
 
   // loading state
   root.innerHTML = `
-    <div class="modal show" role="dialog" aria-modal="true" style="display:flex;">
+    <div class="modal" role="dialog" aria-modal="true">
       <div class="modal-backdrop" data-close></div>
       <div class="modal-dialog" style="display:flex;align-items:center;justify-content:center;min-width:320px;min-height:200px;">
         <div style="opacity:.8">Завантаження…</div>
@@ -189,7 +187,7 @@ document.addEventListener("click", async (e) => {
     if (!j || !j.ok) throw new Error("invalid response");
 
     root.innerHTML = `
-      <div class="modal show" role="dialog" aria-modal="true" style="display:flex;">
+      <div class="modal" role="dialog" aria-modal="true">
         <div class="modal-backdrop" data-close></div>
         <div class="modal-dialog">
           <div class="stream-modal">
@@ -590,7 +588,7 @@ document.addEventListener("click", async (e) => {
   } catch (err) {
     console.error("release_json error", err);
     root.innerHTML = `
-      <div class="modal show" role="dialog" aria-modal="true" style="display:flex;">
+      <div class="modal" role="dialog" aria-modal="true">
         <div class="modal-backdrop" data-close></div>
         <div class="modal-dialog">
           <div class="modal-header">
@@ -606,7 +604,24 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-// (Global outside-click close removed: modal-specific handlers already cover this)
+// Allow closing modal by clicking outside the dialog or on backdrop
+document.addEventListener('click', (e) => {
+  const modal = document.querySelector('.modal');
+  if (!modal) return;
+  const dialog = modal.querySelector('.modal-dialog');
+  if (!dialog) return;
+  const clickedOutside = !dialog.contains(e.target);
+  const clickedBackdrop = e.target.classList.contains('modal-backdrop');
+  if (clickedOutside || clickedBackdrop) {
+    const root = document.getElementById('stream-modal-root') || document.body;
+    if (root && root.contains(modal)) root.innerHTML = '';
+    if (document.body.dataset.scrollLocked) document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
+    if (typeof showFooter === 'function') showFooter();
+    delete document.body.dataset.scrollLocked;
+  }
+});
 // --- /Stream Modal FETCH ------------------------------------------------------
 // === Footer hide/show on modal open/close ===
 const FOOTER_SELECTOR = 'footer.site-footer, .site-footer, footer';
