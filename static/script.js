@@ -135,14 +135,21 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 
 // --- Stream Modal (слухати на майданчиках) — FETCH FROM SERVER -----------------
-document.addEventListener("click", async (e) => {
-  const card = e.target.closest(".release-card");
-  if (!card) return;
+function getReleaseFromHash() {
+  const m = (location.hash || "").match(/release=([^&]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
 
-  e.preventDefault();
-  e.stopPropagation();
+function setReleaseHash(pageId) {
+  if (!pageId) return;
+  history.pushState(null, "", `#release=${encodeURIComponent(pageId)}`);
+}
 
-  const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
+function clearReleaseHash() {
+  history.pushState(null, "", location.pathname + location.search);
+}
+
+async function openReleaseModal(pageId) {
   if (!pageId) return;
 
   // ensure root exists
@@ -168,6 +175,8 @@ document.addEventListener("click", async (e) => {
     document.body.classList.remove('modal-open');
     document.documentElement.classList.remove('modal-open');
   };
+
+  setReleaseHash(pageId);
 
   // loading state
   root.innerHTML = `
@@ -207,6 +216,7 @@ document.addEventListener("click", async (e) => {
       if (modalShellEl) modalShellEl.style.removeProperty('--modal-bg');
       root.innerHTML = '';
       unlockScroll();
+      clearReleaseHash();
       if (typeof showFooter === 'function') showFooter();
     }
     backdropEl && backdropEl.addEventListener('click', closeStreamModal);
@@ -606,9 +616,28 @@ document.addEventListener("click", async (e) => {
         </div>
       </div>
     `;
-    const cleanup = () => { root.innerHTML = ""; if (typeof showFooter === 'function') showFooter(); };
+    const cleanup = () => {
+      root.innerHTML = "";
+      clearReleaseHash();
+      if (typeof showFooter === 'function') showFooter();
+    };
     root.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', cleanup));
   }
+}
+
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".release-card");
+  if (!card) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
+  openReleaseModal(pageId);
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  const releaseId = getReleaseFromHash();
+  if (!releaseId) return;
+  openReleaseModal(releaseId);
 });
 
 // Allow closing modal by clicking outside the dialog or on backdrop
