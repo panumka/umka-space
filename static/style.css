@@ -864,6 +864,19 @@ body.modal-open {
   touch-action: none;       /* блокуємо свайпи фону */
 }
 
+/* iOS/mobile: avoid white screen when body is fixed */
+@media (max-width: 640px) {
+  html.modal-open,
+  body.modal-open {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: auto;
+    height: auto !important;
+  }
+}
+
 /* додатковий захист від горизонтального виходу */
 html, body {
   max-width: 100%;
