@@ -287,9 +287,23 @@ html, body {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+
+  /* blurred cover image background (set via --modal-bg from JS) */
+  background-image:
+    linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.75)),
+    var(--modal-bg, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* always-on blur (works on mobile) */
+  filter: blur(18px);
+  transform: scale(1.08);
+
+  /* extra backdrop blur where supported (desktop/web) */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
   z-index: -1;
 }
 

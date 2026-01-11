@@ -203,6 +203,8 @@ document.addEventListener("click", async (e) => {
     const backdropEl = root.querySelector('.modal-backdrop');
     const closeEls = root.querySelectorAll('[data-close]');
     function closeStreamModal(){
+      const modalShellEl = root.querySelector('.modal');
+      if (modalShellEl) modalShellEl.style.removeProperty('--modal-bg');
       root.innerHTML = '';
       unlockScroll();
       if (typeof showFooter === 'function') showFooter();
@@ -368,6 +370,11 @@ document.addEventListener("click", async (e) => {
         }
         if (backdropEl && coverUrl) {
           backdropEl.style.setProperty('--cover', `url("${coverUrl}")`);
+        }
+        // set blurred modal background (used by #stream-modal-root .modal::before)
+        const modalShellEl = root.querySelector('.modal');
+        if (modalShellEl && coverUrl) {
+          modalShellEl.style.setProperty('--modal-bg', `url("${coverUrl}")`);
         }
         // try to find links container by common selectors or create one
         let linksBox = streamRoot.querySelector(".links, .platforms, .platform-links");
