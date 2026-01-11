@@ -8,6 +8,8 @@ import time
 
 import io
 from urllib.parse import unquote, unquote_plus, urlparse
+import ipaddress
+import socket
 from PIL import Image
 # Safety: guard against decompression-bomb attacks in Pillow
 Image.MAX_IMAGE_PIXELS = int(os.environ.get("UMKA_MAX_IMAGE_PIXELS", "30000000"))  # default 30M px
@@ -412,6 +414,18 @@ def fetch_notion_posts(limit: int = 20):
                 og = get_og_image(url_prop)
                 if og:
                     thumb = og
+        # External URL (optional) for rendering direct links in the blog list
+        ext_url = None
+        for k in ("URL", "Url", "Link", "Посилання"):
+            p = props.get(k)
+            if isinstance(p, dict):
+                ext_url = p.get("url") or ext_url
+                if not ext_url:
+                    rts = p.get("rich_text") or []
+                    if rts:
+                        ext_url = "".join(t.get("plain_text", "") for t in rts).strip() or None
+            if ext_url:
+                break
 
         # Date display and sorting key
         date_iso = date
@@ -432,6 +446,7 @@ def fetch_notion_posts(limit: int = 20):
             "excerpt": excerpt,
             "url": r.get("url"),
             "thumb": thumb,
+            "ext_url": ext_url,
         })
 
     # Local sort by date if present
@@ -901,6 +916,31 @@ def proxy_img():
     if not url:
         app.logger.warning('[proxy_img] missing url param')
         return Response('missing url', status=400)
+    # Minimal SSRF guard: block private/loopback/link-local IPs
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            return Response('bad url scheme', status=400)
+        host = parsed.hostname
+        if not host:
+            return Response('bad url host', status=400)
+        try:
+            ip = ipaddress.ip_address(host)
+            ips = [ip]
+        except ValueError:
+            infos = socket.getaddrinfo(host, None)
+            ips = []
+            for info in infos:
+                try:
+                    ips.append(ipaddress.ip_address(info[4][0]))
+                except ValueError:
+                    continue
+        for ip in ips:
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified:
+                app.logger.warning('[proxy_img] blocked private ip: %s', ip)
+                return Response('blocked host', status=403)
+    except Exception:
+        return Response('bad url', status=400)
 
     # Simple rate-limit per client IP
     client_ip = (request.headers.get('X-Forwarded-For') or request.remote_addr or '0.0.0.0').split(',')[0].strip()
