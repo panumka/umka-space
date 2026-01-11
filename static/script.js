@@ -179,10 +179,8 @@ function clearReleaseHash() {
   history.pushState(null, "", location.pathname + location.search);
 }
 
-let __currentReleaseId = "";
 async function openReleaseModal(pageId, title) {
   if (!pageId) return;
-  __currentReleaseId = pageId;
 
   // ensure root exists
   const root = document.getElementById("stream-modal-root") || (() => {
@@ -265,9 +263,7 @@ async function openReleaseModal(pageId, title) {
       shareBtn.addEventListener('click', async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
-        const url = __currentReleaseId
-          ? `${location.origin}/release/${__currentReleaseId}`
-          : location.href;
+        const url = location.href;
         let ok = false;
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
