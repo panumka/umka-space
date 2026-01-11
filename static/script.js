@@ -211,6 +211,7 @@ async function openReleaseModal(pageId) {
     const dialogEl = root.querySelector('.modal-dialog');
     const backdropEl = root.querySelector('.modal-backdrop');
     const closeEls = root.querySelectorAll('[data-close]');
+    const shareBtn = root.querySelector('[data-share]');
     function closeStreamModal(){
       const modalShellEl = root.querySelector('.modal');
       if (modalShellEl) modalShellEl.style.removeProperty('--modal-bg');
@@ -228,6 +229,31 @@ async function openReleaseModal(pageId) {
     document.addEventListener('keydown', function onEsc(ev){
       if (ev.key === 'Escape'){ closeStreamModal(); document.removeEventListener('keydown', onEsc); }
     });
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const url = location.href;
+        let ok = false;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(url);
+            ok = true;
+          }
+        } catch (err) {
+          ok = false;
+        }
+        if (!ok) {
+          try {
+            window.prompt("Посилання для копіювання:", url);
+          } catch (err) {
+            // no-op
+          }
+        }
+        shareBtn.classList.add('copied');
+        setTimeout(() => shareBtn.classList.remove('copied'), 1200);
+      });
+    }
 
     // enforce compact cover size + two-column layout regardless of server HTML
     const dialog = root.querySelector(".modal-dialog");

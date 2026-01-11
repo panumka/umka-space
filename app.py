@@ -824,12 +824,24 @@ def release_json(page_id: str):
         if not links_html:
             links_html.append('<div class="muted">Посилання відсутні.</div>')
 
+        share_btn = (
+            '<button type="button" class="rm-share" data-share aria-label="Поділитися">'
+            '<svg viewBox="0 0 24 24" aria-hidden="true">'
+            '<path d="M8 3h8a2 2 0 0 1 2 2v6h-2V5H8v14h8v-6h2v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="currentColor"/>'
+            '<path d="M12 2l4 4h-3v7h-2V6H8l4-4z" fill="currentColor"/>'
+            '</svg>'
+            '</button>'
+        )
+
         html = (
             '<div class="release-modal">'
             '  <div class="rm-grid">'
             f'    {cover_html}'
             '    <div class="rm-links">'
-            f'      <h3 class="rm-title">{title}</h3>'
+            '      <div class="rm-title-row">'
+            f'        <h3 class="rm-title">{title}</h3>'
+            f'        {share_btn}'
+            '      </div>'
             f'      {"".join(links_html)}'
             '    </div>'
             '  </div>'
