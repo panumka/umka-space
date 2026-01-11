@@ -544,6 +544,33 @@ html, body {
   font-size: 1.1rem;
   font-weight: 700;
   color: #e9e9e9;
+  text-align: center;
+}
+
+/* Mobile stacking for release modal */
+@media (max-width: 640px) {
+  .rm-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 12px;
+  }
+  .rm-cover {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .rm-links-list {
+    grid-column: 1;
+    grid-row: 2;
+    height: auto;
+  }
+  .rm-title-under {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .rm-share {
+    right: 8px;
+    bottom: 8px;
+  }
 }
 
 /* адаптація під вузькі екрани: кладемо все в колонку */
