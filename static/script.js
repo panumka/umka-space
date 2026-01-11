@@ -413,7 +413,7 @@ async function openReleaseModal(pageId) {
           modalShellEl.style.setProperty('--modal-bg', `url("${coverUrl}")`);
         }
         // try to find links container by common selectors or create one
-        let linksBox = streamRoot.querySelector(".links, .platforms, .platform-links");
+        let linksBox = streamRoot.querySelector(".rm-links, .links, .platforms, .platform-links");
         if (!streamRoot.querySelector(".release-wrap")) {
           const wrap = document.createElement("div");
           wrap.className = "release-wrap";
@@ -459,6 +459,7 @@ async function openReleaseModal(pageId) {
 
         // --- normalize platform links into consistent rows --------------------
         const linksContainer =
+          streamRoot.querySelector(".rm-links-list") ||
           streamRoot.querySelector(".links") ||
           streamRoot.querySelector(".platforms") ||
           streamRoot.querySelector(".platform-links");
