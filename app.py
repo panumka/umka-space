@@ -209,6 +209,23 @@ NOTION_API_KEY = os.environ.get("NOTION_API_KEY", "").strip()
 NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID", "").strip()
 # Notion DB for releases/links to streaming platforms (optional)
 NOTION_STREAMS_DATABASE_ID = os.environ.get("NOTION_STREAMS_DATABASE_ID", "").strip()
+NOTION_TTL_SEC = int(os.environ.get("UMKA_NOTION_TTL_SEC", "600"))
+_NOTION_CACHE = {}  # key -> {"ts": epoch, "data": payload}
+
+def _get_cached_notion(key: str):
+    if not _NOTION_CACHE:
+        return None
+    now = time.time()
+    item = _NOTION_CACHE.get(key)
+    if not item:
+        return None
+    if now - item.get("ts", 0) > NOTION_TTL_SEC:
+        _NOTION_CACHE.pop(key, None)
+        return None
+    return item.get("data")
+
+def _set_cached_notion(key: str, data):
+    _NOTION_CACHE[key] = {"ts": time.time(), "data": data}
 
 # --- helpers: terms + simple filter ---
 
@@ -327,6 +344,11 @@ def fetch_notion_posts(limit: int = 20):
     """
     if not (NOTION_API_KEY and NOTION_DATABASE_ID):
         return []
+
+    cache_key = f"posts:{NOTION_DATABASE_ID}:{limit}"
+    cached = _get_cached_notion(cache_key)
+    if cached is not None:
+        return cached
 
     try:
         notion = Client(auth=NOTION_API_KEY)
@@ -451,6 +473,7 @@ def fetch_notion_posts(limit: int = 20):
 
     # Local sort by date if present
     posts.sort(key=lambda x: x.get("date") or "", reverse=True)
+    _set_cached_notion(cache_key, posts)
     return posts
 
 
@@ -473,6 +496,11 @@ def fetch_stream_releases(limit: int = 24):
     """
     if not (NOTION_API_KEY and NOTION_STREAMS_DATABASE_ID):
         return []
+
+    cache_key = f"streams:{NOTION_STREAMS_DATABASE_ID}:{limit}"
+    cached = _get_cached_notion(cache_key)
+    if cached is not None:
+        return cached
 
     try:
         notion = Client(auth=NOTION_API_KEY)
@@ -565,6 +593,7 @@ def fetch_stream_releases(limit: int = 24):
 
     # Notion manual (drag&drop) order: last row = newest → show first
     items = list(reversed(items))
+    _set_cached_notion(cache_key, items)
     return items
 
 # --- Notion helpers: rich text & blocks -> HTML for modal rendering ---
@@ -965,7 +994,7 @@ def proxy_img():
             'Accept': '*/*',
         }
         # Stream the response and impose size checks
-        r = requests.get(url, timeout=20, headers=headers, allow_redirects=True, stream=True)
+        r = requests.get(url, timeout=(5, 15), headers=headers, allow_redirects=True, stream=True)
         app.logger.info('[proxy_img] upstream %s -> %s', url.split('?')[0], r.status_code)
 
         if r.status_code != 200:
@@ -983,7 +1012,8 @@ def proxy_img():
             return Response('too large', status=413)
 
         # Acceptable types: image/* or application/octet-stream (we'll try to convert)
-        if not (content_type.startswith('image/') or 'octet-stream' in content_type or content_type == ''):
+        allowed_ct = ("image/", "application/octet-stream")
+        if content_type and not (content_type.startswith(allowed_ct[0]) or content_type.startswith(allowed_ct[1])):
             app.logger.warning('[proxy_img] unacceptable content-type: %s', content_type)
             return Response('unsupported media type', status=415)
 
