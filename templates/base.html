@@ -33,7 +33,7 @@
     }
   </style>
 </head>
-<body>
+<body{% if release_id %} data-release-id="{{ release_id }}"{% endif %}>
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
