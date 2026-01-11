@@ -141,6 +141,7 @@ document.addEventListener("click", async (e) => {
 
   e.preventDefault();
   e.stopPropagation();
+  e.stopImmediatePropagation();
 
   const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
   if (!pageId) return;
