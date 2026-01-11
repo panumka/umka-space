@@ -273,8 +273,8 @@ html, body {
   margin: 0 auto;
   background: #111;
   border-radius: 14px;
-  max-width: 780px;
-  width: calc(100% - 24px);
+  width: max-content;
+  max-width: calc(100% - 24px);
   display: flex;
   flex-direction: row;
   gap: 20px;
