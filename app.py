@@ -157,13 +157,42 @@ app.jinja_env.filters["b64encode"] = _b64encode_filter
 # Simple per-user (IP) cache for YouTube results
 YT_CACHE = {}
 YT_TTL_SEC = int(os.environ.get("UMKA_TTL_SEC", "1800"))  # default 30 minutes
+YT_CACHE_MAX = int(os.environ.get("UMKA_YT_CACHE_MAX", "1000"))
+
+def _prune_yt_cache():
+    if not YT_CACHE:
+        return
+    now = time.time()
+    expired = [k for k, v in YT_CACHE.items() if now - v.get("ts", 0) > YT_TTL_SEC]
+    for k in expired:
+        YT_CACHE.pop(k, None)
+    if len(YT_CACHE) > YT_CACHE_MAX:
+        items = sorted(YT_CACHE.items(), key=lambda kv: kv[1].get("ts", 0), reverse=True)
+        YT_CACHE.clear()
+        for k, v in items[:YT_CACHE_MAX]:
+            YT_CACHE[k] = v
 
 # Very simple IP-based rate limit for /proxy_img
 PROXY_LIMIT_COUNT = int(os.environ.get("UMKA_PROXY_LIMIT_COUNT", "60"))          # 60 hits
 PROXY_LIMIT_WINDOW = int(os.environ.get("UMKA_PROXY_LIMIT_WINDOW_SEC", "300"))  # per 5 minutes
 _PROXY_BUCKETS = {}  # ip -> {"ts": epoch, "count": n}
+_PROXY_BUCKETS_MAX = int(os.environ.get("UMKA_PROXY_BUCKETS_MAX", "2000"))
+
+def _prune_proxy_buckets():
+    if not _PROXY_BUCKETS:
+        return
+    now = time.time()
+    expired = [ip for ip, b in _PROXY_BUCKETS.items() if now - b.get("ts", 0) > PROXY_LIMIT_WINDOW]
+    for ip in expired:
+        _PROXY_BUCKETS.pop(ip, None)
+    if len(_PROXY_BUCKETS) > _PROXY_BUCKETS_MAX:
+        items = sorted(_PROXY_BUCKETS.items(), key=lambda kv: kv[1].get("ts", 0), reverse=True)
+        _PROXY_BUCKETS.clear()
+        for ip, b in items[:_PROXY_BUCKETS_MAX]:
+            _PROXY_BUCKETS[ip] = b
 
 def _rate_limited(ip: str) -> bool:
+    _prune_proxy_buckets()
     now = time.time()
     b = _PROXY_BUCKETS.get(ip)
     if not b or now - b["ts"] > PROXY_LIMIT_WINDOW:
@@ -805,6 +834,7 @@ def panamabattle():
     use_refresh = request.args.get('refresh') == '1'
     key = _client_cache_key()
     now = time.time()
+    _prune_yt_cache()
 
     videos = None
     if not use_refresh:

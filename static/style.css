@@ -930,7 +930,7 @@ html, body,
     flex: 1 1 0;
   }
 }
-# Mobile-specific: force-hide footer when a modal is open
+/* Mobile-specific: force-hide footer when a modal is open */
 @media (max-width: 640px) {
   body.modal-open .site-footer,
   body:has(#stream-modal-root .modal),
