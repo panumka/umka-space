@@ -946,8 +946,8 @@ html, body,
 /* Mobile-specific: force-hide footer when a modal is open */
 @media (max-width: 640px) {
   body.modal-open .site-footer,
-  body:has(#stream-modal-root .modal),
-  html:has(#stream-modal-root .modal) body .site-footer {
+  body:has(#stream-modal-root .modal.show) .site-footer,
+  body:has(#post-modal-root .modal.show) .site-footer {
     display: none !important;
     height: 0 !important;
     padding: 0 !important;
