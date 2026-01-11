@@ -171,7 +171,7 @@ document.addEventListener("click", async (e) => {
 
   // loading state
   root.innerHTML = `
-    <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal show" role="dialog" aria-modal="true">
       <div class="modal-backdrop" data-close></div>
       <div class="modal-dialog" style="display:flex;align-items:center;justify-content:center;min-width:320px;min-height:200px;">
         <div style="opacity:.8">Завантаження…</div>
@@ -187,7 +187,7 @@ document.addEventListener("click", async (e) => {
     if (!j || !j.ok) throw new Error("invalid response");
 
     root.innerHTML = `
-      <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal show" role="dialog" aria-modal="true">
         <div class="modal-backdrop" data-close></div>
         <div class="modal-dialog">
           <div class="stream-modal">
@@ -588,7 +588,7 @@ document.addEventListener("click", async (e) => {
   } catch (err) {
     console.error("release_json error", err);
     root.innerHTML = `
-      <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal show" role="dialog" aria-modal="true">
         <div class="modal-backdrop" data-close></div>
         <div class="modal-dialog">
           <div class="modal-header">
