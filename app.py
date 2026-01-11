@@ -908,7 +908,11 @@ def index():
 def release_page(page_id: str):
     need_streams_keys = not (NOTION_API_KEY and NOTION_STREAMS_DATABASE_ID)
     releases = fetch_stream_releases() if not need_streams_keys else []
-    og = None
+    og = {
+        "title": "UmkA",
+        "image": url_for("static", filename="UmkA.png", _external=True),
+        "url": request.url,
+    }
     if NOTION_API_KEY:
         try:
             notion = Client(auth=NOTION_API_KEY)
@@ -916,15 +920,12 @@ def release_page(page_id: str):
             props = page.get("properties", {})
             title_prop = props.get("Name") or props.get("Title") or {}
             title_parts = title_prop.get("title", []) if isinstance(title_prop, dict) else []
-            title = "".join(part.get("plain_text", "") for part in title_parts) or "UmkA"
+            title = "".join(part.get("plain_text", "") for part in title_parts) or og["title"]
             cover_url = _extract_release_cover(props, page)
-            if not cover_url:
-                cover_url = url_for("static", filename="UmkA.png", _external=True)
-            og = {
-                "title": title,
-                "image": cover_url,
-                "url": request.url,
-            }
+            if cover_url:
+                b64 = base64.urlsafe_b64encode(cover_url.encode("utf-8")).decode("utf-8").rstrip("=")
+                og["image"] = url_for("proxy_img", b=b64, _external=True)
+            og["title"] = title
         except Exception as e:
             app.logger.warning("[release_page] og meta failed: %r", e)
     return render_template(
