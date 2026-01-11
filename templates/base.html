@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title or 'UmkA.space' }}</title>
+  {% if og %}
+  <meta property="og:title" content="{{ og.title }}">
+  <meta property="og:image" content="{{ og.image }}">
+  <meta property="og:url" content="{{ og.url }}">
+  <meta property="og:type" content="website">
+  {% endif %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&display=swap">
@@ -36,7 +42,7 @@
     }
   </style>
 </head>
-<body>
+<body{% if release_id %} data-release-id="{{ release_id }}"{% endif %}>
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">

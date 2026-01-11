@@ -596,6 +596,32 @@ def fetch_stream_releases(limit: int = 24):
     _set_cached_notion(cache_key, items)
     return items
 
+def _extract_release_cover(props: dict, page: dict) -> str | None:
+    cover_url = None
+    files_prop = (
+        props.get("Cover")
+        or props.get("Cover Art")
+        or props.get("Files & media")
+        or props.get("Dateien und Medien")
+        or props.get("Files")
+        or {}
+    )
+    if isinstance(files_prop, dict) and files_prop.get("type") == "files":
+        flist = files_prop.get("files", [])
+        if flist:
+            f = flist[0]
+            if f.get("type") == "external":
+                cover_url = (f.get("external") or {}).get("url")
+            elif f.get("type") == "file":
+                cover_url = (f.get("file") or {}).get("url")
+    if not cover_url:
+        cover_obj = page.get("cover") or {}
+        if cover_obj.get("type") == "external":
+            cover_url = (cover_obj.get("external") or {}).get("url")
+        elif cover_obj.get("type") == "file":
+            cover_url = (cover_obj.get("file") or {}).get("url")
+    return cover_url
+
 # --- Notion helpers: rich text & blocks -> HTML for modal rendering ---
 def _rt_to_html(rts: list) -> str:
     parts = []
@@ -778,29 +804,7 @@ def release_json(page_id: str):
         title = "".join(part.get("plain_text", "") for part in title_parts) or "Без назви"
 
         # Cover: prefer Cover / Cover Art / Files & media, else page cover
-        cover_url = None
-        files_prop = (
-            props.get("Cover")
-            or props.get("Cover Art")
-            or props.get("Files & media")
-            or props.get("Dateien und Medien")
-            or props.get("Files")
-            or {}
-        )
-        if isinstance(files_prop, dict) and files_prop.get("type") == "files":
-            flist = files_prop.get("files", [])
-            if flist:
-                f = flist[0]
-                if f.get("type") == "external":
-                    cover_url = (f.get("external") or {}).get("url")
-                elif f.get("type") == "file":
-                    cover_url = (f.get("file") or {}).get("url")
-        if not cover_url:
-            cover_obj = page.get("cover") or {}
-            if cover_obj.get("type") == "external":
-                cover_url = (cover_obj.get("external") or {}).get("url")
-            elif cover_obj.get("type") == "file":
-                cover_url = (cover_obj.get("file") or {}).get("url")
+        cover_url = _extract_release_cover(props, page)
 
         # Platforms (same tolerant variants as in fetch_stream_releases)
         def _prop_url(pdict, key):
@@ -897,6 +901,39 @@ def index():
         title='UmkA тут',
         releases=releases,
         need_streams_keys=need_streams_keys,
+    )
+
+# Shareable release URL with OG meta
+@app.route('/release/<page_id>')
+def release_page(page_id: str):
+    need_streams_keys = not (NOTION_API_KEY and NOTION_STREAMS_DATABASE_ID)
+    releases = fetch_stream_releases() if not need_streams_keys else []
+    og = None
+    if NOTION_API_KEY:
+        try:
+            notion = Client(auth=NOTION_API_KEY)
+            page = notion.pages.retrieve(page_id=page_id)
+            props = page.get("properties", {})
+            title_prop = props.get("Name") or props.get("Title") or {}
+            title_parts = title_prop.get("title", []) if isinstance(title_prop, dict) else []
+            title = "".join(part.get("plain_text", "") for part in title_parts) or "UmkA"
+            cover_url = _extract_release_cover(props, page)
+            if not cover_url:
+                cover_url = url_for("static", filename="UmkA.png", _external=True)
+            og = {
+                "title": title,
+                "image": cover_url,
+                "url": request.url,
+            }
+        except Exception as e:
+            app.logger.warning("[release_page] og meta failed: %r", e)
+    return render_template(
+        'index.html',
+        title='UmkA тут',
+        releases=releases,
+        need_streams_keys=need_streams_keys,
+        release_id=page_id,
+        og=og,
     )
 
 # 🎤 Вкладка — UmkA на PANAMABATTLE

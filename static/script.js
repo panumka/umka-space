@@ -552,6 +552,13 @@ document.addEventListener("click", (e) => {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
+  const bodyRid = document.body && document.body.dataset ? document.body.dataset.releaseId : "";
+  if (bodyRid) {
+    const card = document.querySelector(`.release-card[data-page-id="${bodyRid}"], .release-card[data-id="${bodyRid}"]`);
+    const title = card ? (card.dataset.title || "") : "";
+    openReleaseModal(bodyRid, title);
+    return;
+  }
   const slug = getReleaseFromHash();
   if (!slug) return;
   const cards = Array.from(document.querySelectorAll(".release-card"));
