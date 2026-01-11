@@ -560,12 +560,12 @@ html, body {
   }
   .rm-links-list {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 3;
     height: auto;
   }
   .rm-title-under {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 2;
   }
   .rm-share {
     right: 8px;
