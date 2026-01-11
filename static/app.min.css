@@ -137,9 +137,6 @@ html, body {
 .modal-links a:hover {
     color: #c4b5fd;
 }
-.platforms { list-style: none; padding: 0; }
-.platforms a { display: block; color: var(--text); text-decoration: none; padding: 12px; border-radius: 12px; background: #121212; margin: 8px 0; }
-.platforms a:hover { background: #181818; }
 .site-footer {
   border-top: 1px solid var(--border);
   color: var(--muted);
@@ -373,13 +370,6 @@ html, body {
   color: #e9e9e9;
   font-weight: 600;
   letter-spacing: .2px;
-}
-/* Share button in release modal */
-.rm-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
 .release-modal {
   position: relative;
@@ -727,7 +717,6 @@ html, body {
 }
 /* accessible focus ring */
 .nav-link:focus-visible,
-.platforms a:focus-visible,
 button:focus-visible,
 .platform-row:focus-visible,
 .release-card:focus-visible,
