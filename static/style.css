@@ -450,14 +450,8 @@ html, body {
   justify-content: space-between;
   gap: 12px;
 }
-.release-modal {
-  position: relative;
-}
 .rm-share {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2;
+  position: relative;
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -485,7 +479,7 @@ html, body {
 }
 .rm-share-label {
   position: absolute;
-  top: 40px;
+  top: -36px;
   right: 0;
   background: rgba(0,0,0,0.85);
   color: #e9e9e9;
@@ -519,20 +513,38 @@ html, body {
 }
 
 /* Release modal columns */
-.rm-cover-col {
+.rm-grid {
+  display: grid;
+  grid-template-columns: 360px minmax(200px, 1fr);
+  grid-template-rows: 360px auto;
+  gap: 16px;
+  align-items: start;
+}
+.rm-cover {
+  grid-column: 1;
+  grid-row: 1;
+}
+.rm-links-list {
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 0;
 }
 .rm-title-under {
+  grid-column: 1;
+  grid-row: 2;
   font-size: 1.1rem;
   font-weight: 700;
   color: #e9e9e9;
 }
-.rm-grid {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
+.rm-share {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  align-self: start;
 }
 
 /* адаптація під вузькі екрани: кладемо все в колонку */
