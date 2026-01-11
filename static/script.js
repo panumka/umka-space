@@ -136,7 +136,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // --- Stream Modal (слухати на майданчиках) — FETCH FROM SERVER -----------------
 document.addEventListener("click", async (e) => {
-  const card = e.target.closest(".release-card");
+  const target = e.target instanceof Element ? e.target : null;
+  const card = target ? target.closest(".release-card") : null;
   if (!card) return;
 
   e.preventDefault();
@@ -607,7 +608,8 @@ document.addEventListener("click", async (e) => {
 
 // Allow closing modal by clicking outside the dialog or on backdrop
 document.addEventListener('click', (e) => {
-  if (e.target.closest('.release-card')) return;
+  const target = e.target instanceof Element ? e.target : null;
+  if (target && target.closest('.release-card')) return;
   const modal = document.querySelector('.modal');
   if (!modal) return;
   const dialog = modal.querySelector('.modal-dialog');
