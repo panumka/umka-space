@@ -410,10 +410,21 @@ html, body {
 #stream-modal-root .platform-icon.platform-amazon   { background: #ff9900; }
 #stream-modal-root .platform-icon.platform-yandex   { background: #ffcc00; }
 
+
 #stream-modal-root .platform-name {
   color: #e9e9e9;
   font-weight: 600;
   letter-spacing: .2px;
+}
+
+/* прибираємо підкреслення у назвах платформ (лінки) */
+#stream-modal-root a,
+#stream-modal-root a:hover,
+#stream-modal-root a:focus,
+#stream-modal-root a:active,
+#stream-modal-root a:visited {
+  text-decoration: none !important;
+  color: inherit;
 }
 
 .release-modal {
