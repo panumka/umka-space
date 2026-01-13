@@ -515,6 +515,14 @@ html, body {
   justify-content: space-between;
   gap: 0;
 }
+.rm-links-list a,
+.rm-links-list a:hover,
+.rm-links-list a:focus,
+.rm-links-list a:active,
+.rm-links-list a:visited {
+  text-decoration: none;
+  color: inherit;
+}
 .rm-title-under {
   grid-column: 1;
   grid-row: 2;
