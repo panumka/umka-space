@@ -178,6 +178,13 @@ html, body {
   user-select: none;
   margin-left: 10px;
   display: inline-block;
+  opacity: 0.6;
+}
+.counter-eye .eye {
+  font-size: 12px;
+}
+.counter-eye .count {
+  font-size: 10px;
 }
 
 /* --- PANAMABATTLE grid (centered) --- */
