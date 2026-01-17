@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, send_file, Response, jsonify
+import json
 import os
 import requests
 from dotenv import load_dotenv
@@ -213,6 +214,27 @@ NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID", "").strip()
 NOTION_STREAMS_DATABASE_ID = os.environ.get("NOTION_STREAMS_DATABASE_ID", "").strip()
 NOTION_TTL_SEC = int(os.environ.get("UMKA_NOTION_TTL_SEC", "600"))
 _NOTION_CACHE = {}  # key -> {"ts": epoch, "data": payload}
+
+# --- simple visit counter (cookie-based, persisted to a local file) ---
+COUNTER_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".counter.json")
+COUNTER_COOKIE = "umka_counter"
+
+def _read_counter_total() -> int:
+    try:
+        if os.path.exists(COUNTER_FILE):
+            with open(COUNTER_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f) or {}
+                return int(data.get("unique_total", 0))
+    except Exception:
+        pass
+    return 0
+
+def _write_counter_total(total: int) -> None:
+    try:
+        with open(COUNTER_FILE, "w", encoding="utf-8") as f:
+            json.dump({"unique_total": int(total)}, f)
+    except Exception:
+        pass
 
 def _get_cached_notion(key: str):
     if not _NOTION_CACHE:
@@ -1175,6 +1197,18 @@ def blog():
 @app.route("/healthz")
 def healthz():
     return jsonify(status="ok"), 200
+
+@app.route("/counter.json")
+def counter_json():
+    total = _read_counter_total()
+    has_cookie = bool(request.cookies.get(COUNTER_COOKIE))
+    if not has_cookie:
+        total += 1
+        _write_counter_total(total)
+    resp = jsonify(unique_total=total)
+    if not has_cookie:
+        resp.set_cookie(COUNTER_COOKIE, "1", max_age=60 * 60 * 24 * 365 * 2, samesite="Lax")
+    return resp
 
 @app.route("/robots.txt")
 def robots_txt():

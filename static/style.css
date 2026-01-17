@@ -177,6 +177,7 @@ html, body {
   letter-spacing: 0.3px;
   user-select: none;
   margin-left: 10px;
+  display: inline-block;
 }
 
 /* --- PANAMABATTLE grid (centered) --- */
