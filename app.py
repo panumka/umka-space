@@ -176,8 +176,9 @@ def _prune_yt_cache():
         for k, v in items[:YT_CACHE_MAX]:
             YT_CACHE[k] = v
 
-# Very simple IP-based rate limit for /proxy_img
-PROXY_LIMIT_COUNT = int(os.environ.get("UMKA_PROXY_LIMIT_COUNT", "60"))          # 60 hits
+#
+# /proxy_img rate-limit (images can burst-load; keep defaults generous)
+PROXY_LIMIT_COUNT = int(os.environ.get("UMKA_PROXY_LIMIT_COUNT", "300"))          # 300 hits
 PROXY_LIMIT_WINDOW = int(os.environ.get("UMKA_PROXY_LIMIT_WINDOW_SEC", "300"))  # per 5 minutes
 _PROXY_BUCKETS = {}  # ip -> {"ts": epoch, "count": n}
 _PROXY_BUCKETS_MAX = int(os.environ.get("UMKA_PROXY_BUCKETS_MAX", "2000"))
@@ -1037,15 +1038,18 @@ def proxy_img():
 
     if not url:
         app.logger.warning('[proxy_img] missing url param')
-        return Response('missing url', status=400)
+        blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+        return Response(blank, headers={'Content-Type': 'image/gif'})
     # Minimal SSRF guard: block private/loopback/link-local IPs
     try:
         parsed = urlparse(url)
         if parsed.scheme not in ("http", "https"):
-            return Response('bad url scheme', status=400)
+            blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+            return Response(blank, headers={'Content-Type': 'image/gif'})
         host = parsed.hostname
         if not host:
-            return Response('bad url host', status=400)
+            blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+            return Response(blank, headers={'Content-Type': 'image/gif'})
         try:
             ip = ipaddress.ip_address(host)
             ips = [ip]
@@ -1060,15 +1064,18 @@ def proxy_img():
         for ip in ips:
             if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_unspecified:
                 app.logger.warning('[proxy_img] blocked private ip: %s', ip)
-                return Response('blocked host', status=403)
+                blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+                return Response(blank, headers={'Content-Type': 'image/gif'})
     except Exception:
-        return Response('bad url', status=400)
+        blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+        return Response(blank, headers={'Content-Type': 'image/gif'})
 
     # Simple rate-limit per client IP
     client_ip = (request.headers.get('X-Forwarded-For') or request.remote_addr or '0.0.0.0').split(',')[0].strip()
     if _rate_limited(client_ip):
         app.logger.warning("[proxy_img] rate-limited ip=%s", client_ip)
-        return Response("rate limited", status=429)
+        blank = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+        return Response(blank, headers={'Content-Type': 'image/gif'})
 
     try:
         headers = {
@@ -1076,7 +1083,7 @@ def proxy_img():
             'Accept': '*/*',
         }
         # Stream the response and impose size checks
-        r = requests.get(url, timeout=(5, 15), headers=headers, allow_redirects=True, stream=True)
+        r = _REQ.get(url, timeout=(5, 15), headers=headers, allow_redirects=True, stream=True)
         app.logger.info('[proxy_img] upstream %s -> %s', url.split('?')[0], r.status_code)
 
         if r.status_code != 200:
