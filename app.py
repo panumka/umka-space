@@ -334,7 +334,7 @@ def fetch_panamabattle_videos(max_results=50):
     items.sort(key=lambda x: x.get("published_at") or "", reverse=True)
     return items[:max_results]
 
-def fetch_notion_posts(limit: int = 20):
+def fetch_notion_posts(limit: int | None = None, refresh: bool = False):
     """Return a list of posts from a Notion database (no 'Published' required).
     Expects (recommended) properties:
       - Name (title)
@@ -343,27 +343,70 @@ def fetch_notion_posts(limit: int = 20):
       - Text (rich_text) — optional (used as fallback excerpt)
       - Files & media (files) — optional (first file used as thumb)
     """
+    fetch_all = False
+    if limit is None:
+        try:
+            limit = int(os.environ.get("UMKA_BLOG_LIMIT", "50"))
+        except Exception:
+            limit = 50
+
+    # If limit <= 0, fetch all pages (paginated). Keep a hard safety cap.
+    if int(limit) <= 0:
+        fetch_all = True
+        # Notion API max page_size is 100
+        page_size = 100
+        try:
+            max_scan = int(os.environ.get("UMKA_BLOG_MAX_SCAN", "500"))
+        except Exception:
+            max_scan = 500
+        max_scan = max(1, int(max_scan))
+    else:
+        # Notion API max page_size is 100
+        page_size = max(1, min(int(limit), 100))
+        max_scan = page_size
     if not (NOTION_API_KEY and NOTION_DATABASE_ID):
         return []
 
-    cache_key = f"posts:{NOTION_DATABASE_ID}:{limit}"
-    cached = _get_cached_notion(cache_key)
-    if cached is not None:
-        return cached
+    cache_key = f"posts:{NOTION_DATABASE_ID}:{'all' if fetch_all else page_size}"
+    if not refresh:
+        cached = _get_cached_notion(cache_key)
+        if cached is not None:
+            return cached
 
     try:
         notion = Client(auth=NOTION_API_KEY)
         # No server-side filter/sort: keep it robust if properties are missing
-        resp = notion.databases.query(
-            database_id=NOTION_DATABASE_ID,
-            page_size=limit,
-        )
+        results = []
+        cursor = None
+        while True:
+            resp = notion.databases.query(
+                database_id=NOTION_DATABASE_ID,
+                page_size=page_size,
+                start_cursor=cursor,
+                sorts=[
+                    {"timestamp": "created_time", "direction": "descending"},
+                ],
+            )
+            batch = resp.get("results", []) or []
+            results.extend(batch)
+
+            # Stop conditions
+            if not fetch_all:
+                break
+            if len(results) >= max_scan:
+                results = results[:max_scan]
+                break
+            if not resp.get("has_more"):
+                break
+            cursor = resp.get("next_cursor")
+            if not cursor:
+                break
     except Exception as e:
         print("[Notion] query failed:", e)
         return []
 
     posts = []
-    for r in resp.get("results", []):
+    for r in results:
         props = r.get("properties", {})
 
         # Title
@@ -1116,7 +1159,8 @@ def proxy_img():
 @app.route('/blog')
 def blog():
     need_notion_keys = not (NOTION_API_KEY and NOTION_DATABASE_ID)
-    posts = fetch_notion_posts() if not need_notion_keys else []
+    refresh = request.args.get('refresh') == '1'
+    posts = fetch_notion_posts(refresh=refresh) if not need_notion_keys else []
     return render_template('blog.html', title='UmkA каже', posts=posts, need_notion_keys=need_notion_keys)
 
 
