@@ -171,6 +171,13 @@ html, body {
   padding-bottom: calc(18px + env(safe-area-inset-bottom)); /* разом із нижньою полоскою на iPhone */
   margin-top: auto;           /* притискаємо футер до низу сторінки */
 }
+.counter-eye {
+  font-size: 12px;
+  color: rgba(120, 120, 120, 0.6);
+  letter-spacing: 0.3px;
+  user-select: none;
+  margin-left: 10px;
+}
 
 /* --- PANAMABATTLE grid (centered) --- */
 .video-grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(360px,720px));justify-content:center;align-items:start;margin:16px auto 0}

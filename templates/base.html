@@ -76,7 +76,19 @@
   <footer class="site-footer">
     <div class="container">
       <small>© UmkA, {{ current_year }}</small>
+      <span id="counter" class="counter-eye">👁</span>
     </div>
   </footer>
+  <script>
+    fetch("/counter.json")
+      .then(r => r.json())
+      .then(d => {
+        const el = document.getElementById("counter");
+        if (el && d && d.unique_total != null) {
+          el.textContent = `👁 ${d.unique_total}`;
+        }
+      })
+      .catch(() => {});
+  </script>
 </body>
 </html>
