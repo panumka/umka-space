@@ -76,10 +76,7 @@
   <footer class="site-footer">
     <div class="container">
       <small>© UmkA, {{ current_year }}</small>
-      <span id="counter" class="counter-eye">
-        <span class="eye">&#x1F441;&#xFE0E;</span>
-        <span class="count"></span>
-      </span>
+      <span id="counter" class="counter-eye"></span>
     </div>
   </footer>
   <script>
@@ -88,8 +85,7 @@
       .then(d => {
         const el = document.getElementById("counter");
         if (el && d && d.unique_total != null) {
-          const count = el.querySelector(".count");
-          if (count) count.textContent = ` ${d.unique_total}`;
+          el.textContent = String(d.unique_total);
         }
       })
       .catch(() => {});
