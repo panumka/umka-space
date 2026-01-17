@@ -78,7 +78,8 @@ def _favicon_from_url(url: str) -> str | None:
         return None
 
 
-load_dotenv(override=True)
+_ENV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+load_dotenv(_ENV_PATH, override=True)
 pillow_heif.register_heif_opener()
 
 
