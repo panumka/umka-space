@@ -81,6 +81,7 @@ html, body {
 .chart-banner{
   display:flex;
   align-items:center;
+  justify-content: center;
   gap:10px;
   padding:10px 14px;
   margin:12px auto 0;
@@ -116,7 +117,7 @@ html, body {
 }
 
 .chart-banner__cta{
-  margin-left:auto;
+  margin-left: 6px;
   opacity:.6;
   font-weight: 700;
 }
