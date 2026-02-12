@@ -11,7 +11,7 @@ import io
 from urllib.parse import unquote, unquote_plus, urlparse
 import ipaddress
 import socket
-from PIL import Image
+from PIL import Image, ImageOps
 # Safety: guard against decompression-bomb attacks in Pillow
 Image.MAX_IMAGE_PIXELS = int(os.environ.get("UMKA_MAX_IMAGE_PIXELS", "30000000"))  # default 30M px
 import pillow_heif
@@ -214,6 +214,8 @@ NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID", "").strip()
 NOTION_STREAMS_DATABASE_ID = os.environ.get("NOTION_STREAMS_DATABASE_ID", "").strip()
 NOTION_TTL_SEC = int(os.environ.get("UMKA_NOTION_TTL_SEC", "600"))
 _NOTION_CACHE = {}  # key -> {"ts": epoch, "data": payload}
+PAGE_TTL_SEC = int(os.environ.get("UMKA_PAGE_TTL_SEC", "45"))
+_PAGE_CACHE = {}  # key -> {"ts": epoch, "html": str}
 
 # --- simple visit counter (cookie-based, persisted to a local file) ---
 COUNTER_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".counter.json")
@@ -250,6 +252,20 @@ def _get_cached_notion(key: str):
 
 def _set_cached_notion(key: str, data):
     _NOTION_CACHE[key] = {"ts": time.time(), "data": data}
+
+def _get_cached_page_html(key: str) -> str | None:
+    item = _PAGE_CACHE.get(key)
+    if not item:
+        return None
+    if time.time() - item.get("ts", 0) > PAGE_TTL_SEC:
+        _PAGE_CACHE.pop(key, None)
+        return None
+    return item.get("html")
+
+def _set_cached_page_html(key: str, html: str) -> None:
+    if not html:
+        return
+    _PAGE_CACHE[key] = {"ts": time.time(), "html": html}
 
 # --- helpers: terms + simple filter ---
 
@@ -961,18 +977,30 @@ def _client_cache_key():
 # 🏠 Головна сторінка — UmkA на музичних майданчиках
 @app.route('/')
 def index():
+    page_cache_key = f"index:{request.host}"
+    cached_html = _get_cached_page_html(page_cache_key)
+    if cached_html:
+        return Response(cached_html, mimetype="text/html")
+
     need_streams_keys = not (NOTION_API_KEY and NOTION_STREAMS_DATABASE_ID)
     releases = fetch_stream_releases() if not need_streams_keys else []
-    return render_template(
+    html = render_template(
         'index.html',
         title='UmkA тут',
         releases=releases,
         need_streams_keys=need_streams_keys,
     )
+    _set_cached_page_html(page_cache_key, html)
+    return Response(html, mimetype="text/html")
 
 # Shareable release URL with OG meta
 @app.route('/release/<page_id>')
 def release_page(page_id: str):
+    page_cache_key = f"release:{request.host}:{page_id}"
+    cached_html = _get_cached_page_html(page_cache_key)
+    if cached_html:
+        return Response(cached_html, mimetype="text/html")
+
     need_streams_keys = not (NOTION_API_KEY and NOTION_STREAMS_DATABASE_ID)
     releases = fetch_stream_releases() if not need_streams_keys else []
     og = {
@@ -995,7 +1023,7 @@ def release_page(page_id: str):
             og["title"] = title
         except Exception as e:
             app.logger.warning("[release_page] og meta failed: %r", e)
-    return render_template(
+    html = render_template(
         'index.html',
         title='UmkA тут',
         releases=releases,
@@ -1003,6 +1031,8 @@ def release_page(page_id: str):
         release_id=page_id,
         og=og,
     )
+    _set_cached_page_html(page_cache_key, html)
+    return Response(html, mimetype="text/html")
 
 # 🎤 Вкладка — UmkA на PANAMABATTLE
 @app.route('/panamabattle')
@@ -1044,6 +1074,53 @@ def proxy_img():
     """
     # Config
     MAX_BYTES = int(os.environ.get("UMKA_PROXY_MAX_BYTES", "5000000"))  # default 5 MB
+    # Optional output transforms for list views (safe defaults)
+    def _as_int(val: str | None, default: int, lo: int, hi: int) -> int:
+        try:
+            n = int(val) if val is not None else default
+        except Exception:
+            n = default
+        return max(lo, min(hi, n))
+    target_w = _as_int(request.args.get("w"), 0, 0, 2048)
+    quality = _as_int(request.args.get("q"), 82, 40, 95)
+    fmt = (request.args.get("fmt") or "").strip().lower()
+    if fmt not in ("", "jpeg", "jpg", "webp"):
+        fmt = ""
+
+    def _encode_transformed(img_bytes: bytes, source_ct: str) -> Response | None:
+        if target_w <= 0 and not fmt:
+            return None
+        try:
+            im = Image.open(io.BytesIO(img_bytes))
+            im = ImageOps.exif_transpose(im)
+            if target_w > 0 and im.width > target_w:
+                ratio = target_w / float(im.width)
+                target_h = max(1, int(im.height * ratio))
+                im = im.resize((target_w, target_h), Image.Resampling.LANCZOS)
+
+            out = io.BytesIO()
+            out_fmt = "WEBP" if fmt == "webp" else "JPEG"
+            save_kwargs = {"quality": quality, "optimize": True}
+            if out_fmt == "WEBP":
+                save_kwargs["method"] = 6
+            else:
+                if im.mode in ("RGBA", "LA", "P"):
+                    if im.mode == "P":
+                        im = im.convert("RGBA")
+                    bg = Image.new("RGB", im.size, (0, 0, 0))
+                    alpha = im.split()[-1] if im.mode in ("RGBA", "LA") else None
+                    bg.paste(im, mask=alpha)
+                    im = bg
+                else:
+                    im = im.convert("RGB")
+            im.save(out, format=out_fmt, **save_kwargs)
+            out.seek(0)
+            resp = send_file(out, mimetype="image/webp" if out_fmt == "WEBP" else "image/jpeg")
+            resp.headers["Cache-Control"] = "public, max-age=604800"
+            return resp
+        except Exception as e:
+            app.logger.warning("[proxy_img] transform failed: %r", e)
+            return None
 
     # 1) Читаємо URL
     raw_b = request.args.get('b')
@@ -1140,6 +1217,10 @@ def proxy_img():
                 raw_chunks.write(chunk)
         raw = raw_chunks.getvalue()
 
+        transformed = _encode_transformed(raw, content_type)
+        if transformed is not None:
+            return transformed
+
         # Helper: convert any bytes to JPEG and send as response with bomb protection
         def _as_jpeg(img_bytes: bytes) -> Response:
             try:
@@ -1149,7 +1230,7 @@ def proxy_img():
                 im.convert('RGB').save(out, format='JPEG', quality=88)
                 out.seek(0)
                 resp = send_file(out, mimetype='image/jpeg')
-                resp.headers['Cache-Control'] = 'public, max-age=86400'
+                resp.headers['Cache-Control'] = 'public, max-age=604800'
                 return resp
             except Exception as e:
                 # If Pillow raises DecompressionBombError or other parsing errors, log and fallback
@@ -1165,7 +1246,7 @@ def proxy_img():
         if content_type.startswith('image/') and raw:
             resp = Response(raw, headers={
                 'Content-Type': content_type,
-                'Cache-Control': 'public, max-age=86400',
+                'Cache-Control': 'public, max-age=604800',
             })
             return resp
 

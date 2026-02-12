@@ -19,7 +19,12 @@
                data-page-id="{{ r.id }}">
         <div class="cover-wrap">
           {% if r.cover %}
-            <img src="/proxy_img?b={{ r.cover | b64encode }}" alt="{{ r.title }}" loading="lazy" decoding="async">
+            <img src="/proxy_img?b={{ r.cover | b64encode }}&w=640&q=76"
+                 alt="{{ r.title }}"
+                 width="260"
+                 height="260"
+                 loading="lazy"
+                 decoding="async">
           {% else %}
             <div class="cover-placeholder">🎵</div>
           {% endif %}
