@@ -874,6 +874,11 @@ def release_json(page_id: str):
     if not NOTION_API_KEY:
         return jsonify(ok=False, error="Missing NOTION_API_KEY"), 400
 
+    cache_key = f"release_json:{page_id}"
+    cached = _get_cached_notion(cache_key)
+    if cached is not None:
+        return jsonify(cached)
+
     try:
         notion = Client(auth=NOTION_API_KEY)
 
@@ -962,7 +967,9 @@ def release_json(page_id: str):
             '  </div>'
             '</div>'
         )
-        return jsonify(ok=True, title=title, html=html, links=links)
+        payload = {"ok": True, "title": title, "html": html, "links": links}
+        _set_cached_notion(cache_key, payload)
+        return jsonify(payload)
 
     except Exception as e:
         app.logger.error("[release_json] failed: %r", e)

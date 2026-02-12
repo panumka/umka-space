@@ -220,9 +220,77 @@ async function openReleaseModal(pageId, title) {
   lockScroll();
   if (typeof hideFooter === 'function') hideFooter();
 
+  const RELEASE_MODAL_CACHE = (window.__umkaReleaseModalCache = window.__umkaReleaseModalCache || {});
+
+  function escHtml(s){
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+  function escAttr(s){
+    return escHtml(s).replace(/`/g, "&#96;");
+  }
+  function fromCardPayload(cardEl){
+    if (!cardEl) return null;
+    let links = [];
+    try {
+      const raw = cardEl.dataset.links;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) links = parsed;
+      }
+    } catch (e) {}
+    const coverB64 = (cardEl.dataset.coverb64 || "").trim();
+    const modalTitle = (cardEl.dataset.title || title || "").trim() || "Без назви";
+    if (!links.length && !coverB64) return null;
+
+    const coverHtml = coverB64
+      ? `<div class="rm-cover"><img src="/proxy_img?b=${encodeURIComponent(coverB64)}&w=800&q=80" alt="${escAttr(modalTitle)}" loading="lazy" decoding="async"></div>`
+      : "";
+    const linksHtml = links.length
+      ? links.map((l) => {
+          const label = escHtml(l && (l.label || l.name || ""));
+          const url = String(l && (l.url || l.href || "") || "").trim();
+          if (!label || !url) return "";
+          return `<a class="btn btn-sm link-btn platform-${escAttr(l.key || "")}" href="${escAttr(url)}" target="_blank" rel="noopener">${label}</a>`;
+        }).join("")
+      : '<div class="muted">Посилання відсутні.</div>';
+    const shareBtn = (
+      '<button type="button" class="rm-share" data-share aria-label="Поділитися">'
+      + '<svg viewBox="0 0 24 24" aria-hidden="true">'
+      + '<path d="M12 3l4 4m-4-4l-4 4m4-4v11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M5 10v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '</svg>'
+      + '<span class="rm-share-label" aria-live="polite">Скопійовано</span>'
+      + '</button>'
+    );
+    const html = (
+      '<div class="release-modal">'
+      + '  <div class="rm-grid">'
+      + `    ${coverHtml}`
+      + '    <div class="rm-links-list">'
+      + `      ${linksHtml}`
+      + '    </div>'
+      + `    <div class="rm-title-under">${escHtml(modalTitle)}</div>`
+      + `    ${shareBtn}`
+      + '  </div>'
+      + '</div>'
+    );
+    return { ok: true, title: modalTitle, html, links };
+  }
+
+  const cardForPayload = document.querySelector(`.release-card[data-page-id="${pageId}"], .release-card[data-id="${pageId}"]`);
+
   try {
-    const r = await fetch(`/release_json/${pageId}`);
-    const j = await r.json();
+    let j = RELEASE_MODAL_CACHE[pageId] || fromCardPayload(cardForPayload) || null;
+    if (!j) {
+      const r = await fetch(`/release_json/${pageId}`);
+      j = await r.json();
+    }
+    if (j && j.ok) RELEASE_MODAL_CACHE[pageId] = j;
     if (!j || !j.ok) throw new Error("invalid response");
 
     root.innerHTML = `
