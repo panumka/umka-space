@@ -613,6 +613,9 @@ document.addEventListener("click", (e) => {
   const card = e.target.closest(".release-card");
   if (!card) return;
   e.preventDefault();
+  if (typeof e.stopImmediatePropagation === "function") {
+    e.stopImmediatePropagation();
+  }
   e.stopPropagation();
   const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
   const title = card.dataset.title || "";
