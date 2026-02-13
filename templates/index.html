@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="releases">
+  <h1 class="sr-only">UmkA тут</h1>
   {% if need_streams_keys %}
     <p class="hint">Додай NOTION_API_KEY та NOTION_STREAMS_DATABASE_ID до .env, щоб підвантажити релізи з Notion.</p>
   {% elif releases|length == 0 %}

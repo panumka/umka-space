@@ -3,13 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title or 'UmkA.space' }}</title>
-  {% if og %}
-  <meta property="og:title" content="{{ og.title }}">
-  <meta property="og:image" content="{{ og.image }}">
-  <meta property="og:url" content="{{ og.url }}">
+  {% set page_title = title or 'UmkA.space' %}
+  {% set page_description = description or 'UmkA music: релізи, стримінг-посилання, блог та контент UmkA.' %}
+  {% set page_canonical = canonical or (request.url_root.rstrip('/') ~ request.path) %}
+  {% set og_title = (og.title if og and og.title else page_title) %}
+  {% set og_description = (og.description if og and og.description else page_description) %}
+  {% set og_url = (og.url if og and og.url else page_canonical) %}
+  {% set og_image = (og.image if og and og.image else url_for('static', filename='UmkA.png', _external=True)) %}
+  <title>{{ page_title }}</title>
+  <meta name="description" content="{{ page_description }}">
+  <meta name="robots" content="{{ robots or 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' }}">
+  <link rel="canonical" href="{{ page_canonical }}">
   <meta property="og:type" content="website">
-  {% endif %}
+  <meta property="og:locale" content="uk_UA">
+  <meta property="og:site_name" content="UmkA.space">
+  <meta property="og:title" content="{{ og_title }}">
+  <meta property="og:description" content="{{ og_description }}">
+  <meta property="og:url" content="{{ og_url }}">
+  <meta property="og:image" content="{{ og_image }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ og_title }}">
+  <meta name="twitter:description" content="{{ og_description }}">
+  <meta name="twitter:image" content="{{ og_image }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&display=swap">
@@ -23,42 +38,26 @@
   <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
   <meta name="theme-color" content="#111111">
   <script defer src="{{ url_for('static', filename='app.min.js') }}"></script>
-  <style>
-    .logo-main {
-      font-size: 22px;
-    }
-    .logo-sub {
-      font-size: 18px;
-    }
-    .special-font {
-      font-family: inherit;
-      letter-spacing: 0.2px;
-    }
-    .nav-text, .nav-top, .nav-bottom {
-      font-family: inherit;
-      font-weight: 400;
-      letter-spacing: 0.2px;
-    }
-  </style>
 </head>
 <body{% if release_id %} data-release-id="{{ release_id }}"{% endif %}>
+  <a class="skip-link" href="#main-content">Перейти до основного контенту</a>
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
         <!-- Лого потім; зараз просто назва згідно з вимогою: U та A великі -->
         <a href="{{ url_for('index') }}" class="logo">
           <span class="logo-main">UmkA</span>
-          <span class="logo-sub" style="display:block; line-height:1;">music</span>
+          <span class="logo-sub">music</span>
         </a>
       </div>
       <nav class="main-nav" aria-label="Головна навігація">
-        <a href="/panamabattle" class="nav-link {% if active == 'panamabattle' %}active{% endif %}" {% if active == 'panamabattle' %}aria-current="page"{% endif %}>
+        <a href="{{ url_for('panamabattle') }}" class="nav-link {% if active == 'panamabattle' %}active{% endif %}" {% if active == 'panamabattle' %}aria-current="page"{% endif %}>
           <div class="nav-text special-font">
             <span class="nav-top">UmkA</span><br>
             <span class="nav-bottom">PANAMABATTLE</span>
           </div>
         </a>
-        <a href="/blog" class="nav-link {% if active == 'blog' %}active{% endif %}" {% if active == 'blog' %}aria-current="page"{% endif %}>
+        <a href="{{ url_for('blog') }}" class="nav-link {% if active == 'blog' %}active{% endif %}" {% if active == 'blog' %}aria-current="page"{% endif %}>
           <div class="nav-text special-font">
             <span class="nav-top">UmkA</span><br>
             <span class="nav-bottom">каже</span>
@@ -79,14 +78,14 @@
 </a>
 {% endif %}
 
-  <main class="container content">
+  <main id="main-content" class="container content" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
 
   <footer class="site-footer">
     <div class="container">
       <small>© UmkA, {{ current_year }}</small>
-      <span id="counter" class="counter-eye"></span>
+      <span id="counter" class="counter-eye" aria-live="polite" aria-label="Лічильник відвідувань"></span>
     </div>
   </footer>
   <script>

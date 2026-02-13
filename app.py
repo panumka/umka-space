@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, send_file, Response, jsonify
+from flask import Flask, render_template, request, send_file, Response, jsonify, url_for
 import json
 import os
 import requests
 from dotenv import load_dotenv
-from bs4 import BeautifulSoup
+try:
+    from bs4 import BeautifulSoup
+except Exception:
+    BeautifulSoup = None
 from notion_client import Client
 import time
 
@@ -16,6 +19,7 @@ from PIL import Image, ImageOps
 Image.MAX_IMAGE_PIXELS = int(os.environ.get("UMKA_MAX_IMAGE_PIXELS", "30000000"))  # default 30M px
 import pillow_heif
 import base64
+from xml.sax.saxutils import escape as xml_escape
 
 # --- requests retrying session helpers ---
 from requests.adapters import HTTPAdapter
@@ -52,12 +56,26 @@ def get_og_image(url: str) -> str | None:
         r = _REQ.get(url, headers=headers, timeout=5)
         if r.status_code != 200 or not (r.text or "").strip():
             return None
-        soup = BeautifulSoup(r.text, "html.parser")
-        # Prefer og:image, but also try twitter:image as fallback
-        for prop, attr in (("og:image", "property"), ("twitter:image", "name")):
-            tag = soup.find("meta", {attr: prop})
-            if tag and tag.get("content"):
-                return tag.get("content").strip()
+        html = r.text or ""
+        if BeautifulSoup is not None:
+            soup = BeautifulSoup(html, "html.parser")
+            # Prefer og:image, but also try twitter:image as fallback
+            for prop, attr in (("og:image", "property"), ("twitter:image", "name")):
+                tag = soup.find("meta", {attr: prop})
+                if tag and tag.get("content"):
+                    return tag.get("content").strip()
+        else:
+            import re
+            patterns = [
+                r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']',
+                r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']',
+                r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']',
+                r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']twitter:image["\']',
+            ]
+            for p in patterns:
+                m = re.search(p, html, flags=re.IGNORECASE)
+                if m and m.group(1):
+                    return m.group(1).strip()
     except Exception:
         pass
     return None
@@ -87,6 +105,13 @@ pillow_heif.register_heif_opener()
 
 
 app = Flask(__name__)
+
+def _public_base_url() -> str:
+    env_base = os.environ.get("UMKA_SITE_URL", "").strip()
+    if env_base.startswith(("http://", "https://")):
+        return env_base.rstrip("/")
+    return request.url_root.rstrip("/")
+
 # --- Auto cache-busting for static files (adds ?v=<mtime>) ---
 from flask import url_for as _flask_url_for
 
@@ -994,6 +1019,8 @@ def index():
     html = render_template(
         'index.html',
         title='UmkA тут',
+        description='Офіційні релізи UmkA та посилання на Spotify, Apple Music, YouTube Music і інші стримінги.',
+        active='home',
         releases=releases,
         need_streams_keys=need_streams_keys,
     )
@@ -1033,6 +1060,8 @@ def release_page(page_id: str):
     html = render_template(
         'index.html',
         title='UmkA тут',
+        description='Слухайте реліз UmkA на улюбленому музичному майданчику.',
+        active='home',
         releases=releases,
         need_streams_keys=need_streams_keys,
         release_id=page_id,
@@ -1063,6 +1092,8 @@ def panamabattle():
     return render_template(
         'panamabattle.html',
         title='UmkA — на PANAMABATTLE',
+        description='Виступи UmkA на PANAMABATTLE: добірка відео та посилань на YouTube.',
+        active='panamabattle',
         videos=videos,
         need_api_key=False,
     )
@@ -1278,7 +1309,14 @@ def blog():
     need_notion_keys = not (NOTION_API_KEY and NOTION_DATABASE_ID)
     refresh = request.args.get('refresh') == '1'
     posts = fetch_notion_posts(refresh=refresh) if not need_notion_keys else []
-    return render_template('blog.html', title='UmkA каже', posts=posts, need_notion_keys=need_notion_keys)
+    return render_template(
+        'blog.html',
+        title='UmkA каже',
+        description='Блог UmkA: новини, думки, посилання та матеріали з Notion.',
+        active='blog',
+        posts=posts,
+        need_notion_keys=need_notion_keys,
+    )
 
 
 # --- healthcheck, robots.txt, security.txt endpoints ---
@@ -1300,8 +1338,78 @@ def counter_json():
 
 @app.route("/robots.txt")
 def robots_txt():
-    body = "User-agent: *\nAllow: /\n"
+    base = _public_base_url()
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /healthz\n"
+        "Disallow: /counter.json\n"
+        "Disallow: /proxy_img\n"
+        "Disallow: /post_json/\n"
+        "Disallow: /release_json/\n"
+        f"Sitemap: {base}/sitemap.xml\n"
+    )
     return Response(body, mimetype="text/plain")
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    from datetime import datetime
+
+    now_date = datetime.utcnow().date().isoformat()
+    urls = [
+        {
+            "loc": url_for("index", _external=True),
+            "lastmod": now_date,
+            "changefreq": "daily",
+            "priority": "1.0",
+        },
+        {
+            "loc": url_for("blog", _external=True),
+            "lastmod": now_date,
+            "changefreq": "daily",
+            "priority": "0.8",
+        },
+        {
+            "loc": url_for("panamabattle", _external=True),
+            "lastmod": now_date,
+            "changefreq": "daily",
+            "priority": "0.8",
+        },
+    ]
+
+    if NOTION_API_KEY and NOTION_STREAMS_DATABASE_ID:
+        for item in fetch_stream_releases(limit=200):
+            page_id = (item or {}).get("id")
+            if not page_id:
+                continue
+            release_date = (item.get("date") or now_date)[:10]
+            urls.append(
+                {
+                    "loc": url_for("release_page", page_id=page_id, _external=True),
+                    "lastmod": release_date,
+                    "changefreq": "weekly",
+                    "priority": "0.7",
+                }
+            )
+
+    items_xml = []
+    for u in urls:
+        items_xml.append(
+            "  <url>\n"
+            f"    <loc>{xml_escape(u['loc'])}</loc>\n"
+            f"    <lastmod>{xml_escape(u['lastmod'])}</lastmod>\n"
+            f"    <changefreq>{u['changefreq']}</changefreq>\n"
+            f"    <priority>{u['priority']}</priority>\n"
+            "  </url>"
+        )
+
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + "\n".join(items_xml)
+        + "\n</urlset>\n"
+    )
+    return Response(xml, mimetype="application/xml")
 
 @app.route("/.well-known/security.txt")
 def security_txt():

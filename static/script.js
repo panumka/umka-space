@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // prevent double init
   if (window.__umkaPostModalBound) return; 
   window.__umkaPostModalBound = true;
+  let lastFocusedEl = null;
 
   function closeModal(overlay){
     if(!overlay) return;
@@ -41,6 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.style.overflow = '';
     document.body.classList.remove('modal-open');
     document.documentElement.classList.remove('modal-open');
+    if (lastFocusedEl && typeof lastFocusedEl.focus === "function") {
+      lastFocusedEl.focus();
+    }
     if (typeof showFooter === 'function') showFooter();
   }
 
@@ -64,10 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .umka-modal .body ul, .umka-modal .body ol{padding-left:20px}
         .umka-modal .body blockquote{margin:12px 0;padding:8px 12px;border-left:3px solid #444;opacity:.9}
       </style>
-      <div class="umka-modal" role="dialog" aria-modal="true">
+      <div class="umka-modal" role="dialog" aria-modal="true" aria-labelledby="post-modal-title" tabindex="-1">
         <header>
-          <span class="x" aria-label="Close">×</span>
-          <h2>${title || ''}</h2>
+          <button type="button" class="x" aria-label="Закрити">×</button>
+          <h2 id="post-modal-title">${title || ''}</h2>
           ${date ? `<div style="opacity:.7;font-size:13px;margin-top:4px">${date}</div>`: ''}
         </header>
         <div class="body">${html || ''}</div>
@@ -83,11 +87,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // mount
     const root = document.getElementById('post-modal-root') || document.body;
+    lastFocusedEl = document.activeElement;
     root.appendChild(overlay);
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
     document.body.classList.add('modal-open');
     document.documentElement.classList.add('modal-open');
+    const modal = overlay.querySelector('.umka-modal');
+    const closeBtn = overlay.querySelector('.x');
+    if (closeBtn && typeof closeBtn.focus === 'function') {
+      closeBtn.focus();
+    } else if (modal && typeof modal.focus === 'function') {
+      modal.focus();
+    }
     if (typeof hideFooter === 'function') hideFooter();
   }
 
@@ -181,6 +193,7 @@ function clearReleaseHash() {
 
 async function openReleaseModal(pageId, title) {
   if (!pageId) return;
+  const prevFocusedEl = document.activeElement;
 
   // ensure root exists
   const root = document.getElementById("stream-modal-root") || (() => {
@@ -297,6 +310,7 @@ async function openReleaseModal(pageId, title) {
       <div class="modal show" role="dialog" aria-modal="true">
         <div class="modal-backdrop" data-close></div>
         <div class="modal-dialog">
+          <button type="button" class="modal-close" data-close aria-label="Закрити модальне вікно">×</button>
           <div class="stream-modal">
             ${j.html || "<div class='modal-body'><em>Порожньо</em></div>"}
           </div>
@@ -316,10 +330,15 @@ async function openReleaseModal(pageId, title) {
       root.innerHTML = '';
       unlockScroll();
       clearReleaseHash();
+      if (prevFocusedEl && typeof prevFocusedEl.focus === "function") {
+        prevFocusedEl.focus();
+      }
       if (typeof showFooter === 'function') showFooter();
     }
     backdropEl && backdropEl.addEventListener('click', closeStreamModal);
     closeEls.forEach(el => el.addEventListener('click', closeStreamModal));
+    const closeBtn = root.querySelector('.modal-close');
+    if (closeBtn && typeof closeBtn.focus === "function") closeBtn.focus();
     modalEl && modalEl.addEventListener('click', (ev)=>{
       if (!dialogEl) return;
       if (!dialogEl.contains(ev.target)) closeStreamModal();
@@ -620,6 +639,22 @@ document.addEventListener("click", (e) => {
   const pageId = card.dataset.id || card.dataset.pageId || card.getAttribute("data-page-id");
   const title = card.dataset.title || "";
   openReleaseModal(pageId, title);
+});
+
+document.addEventListener("keydown", (e) => {
+  const card = e.target.closest(".release-card");
+  if (!card) return;
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  card.click();
+});
+
+document.addEventListener("keydown", (e) => {
+  const postCard = e.target.closest(".post-card[data-post-id]");
+  if (!postCard) return;
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  postCard.click();
 });
 
 window.addEventListener("DOMContentLoaded", () => {

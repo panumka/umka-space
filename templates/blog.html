@@ -15,15 +15,15 @@
   {% if posts and posts|length > 0 %}
     <div class="cards">
       {% for p in posts %}
-        <article class="card post-card" data-page-id="{{ p.id }}">
+        <article class="card post-card" data-page-id="{{ p.id }}" {% if not p.ext_url %}data-post-id="{{ p.id }}" role="button" tabindex="0" aria-label="Відкрити пост: {{ p.title }}"{% endif %}>
           {% if p.thumb %}
             {% if p.ext_url %}
               <a href="{{ p.ext_url }}" target="_blank" rel="noopener" class="pink-link">
-                <img src="/proxy_img?b={{ p.thumb | b64encode }}&cb={{ p.date_display or p.id }}" alt="" class="thumb" loading="lazy" decoding="async" />
+                <img src="/proxy_img?b={{ p.thumb | b64encode }}&cb={{ p.date_display or p.id }}" alt="Обкладинка: {{ p.title }}" class="thumb" loading="lazy" decoding="async" />
               </a>
             {% else %}
               <a href="#" class="post-open pink-link" data-id="{{ p.id }}">
-                <img src="/proxy_img?b={{ p.thumb | b64encode }}&cb={{ p.date_display or p.id }}" alt="" class="thumb" loading="lazy" decoding="async" />
+                <img src="/proxy_img?b={{ p.thumb | b64encode }}&cb={{ p.date_display or p.id }}" alt="Обкладинка: {{ p.title }}" class="thumb" loading="lazy" decoding="async" />
               </a>
             {% endif %}
           {% endif %}
@@ -50,12 +50,4 @@
     <p class="placeholder">Поки що нотаток немає.</p>
   {% endif %}
   <div id="post-modal-root"></div>
-  <style>
-    .pink-link {
-      color: #ffb6c1; /* ніжно-рожевий */
-    }
-    .pink-link:hover {
-      color: #ffc0cb;
-    }
-  </style>
 {% endblock %}

@@ -4,6 +4,9 @@
     --muted: #9aa0a6;
     --border: #262626;
     --card: #151515;
+    --accent: #7dd3fc;
+    --focus-ring: 0 0 0 3px rgba(125, 211, 252, 0.35);
+    --focus-outline: #7dd3fc;
 }
 body {
   background: var(--bg);
@@ -18,6 +21,32 @@ html, body {
   max-width: 100%;
   overflow-x: hidden;
   height: 100%;              /* потрібно для min-height:100vh + flex */
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  z-index: 10000;
+  background: #111;
+  color: #fff;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 12px;
 }
 .container {
   max-width: 1200px;
@@ -45,15 +74,24 @@ html, body {
 .logo-main {
   display: block;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 22px;
   line-height: 1.05;
 }
 .logo-sub {
   display: block;
   font-weight: 400;
-  font-size: 13px;
+  font-size: 18px;
   line-height: 1;
-  margin-top: -6px;
+  margin-top: 0;
+}
+.special-font {
+  font-family: inherit;
+  letter-spacing: 0.2px;
+}
+.nav-text, .nav-top, .nav-bottom {
+  font-family: inherit;
+  font-weight: 400;
+  letter-spacing: 0.2px;
 }
 .main-nav { display: flex; gap: 16px; align-items: flex-end; }
 .nav-link {
@@ -64,6 +102,16 @@ html, body {
 }
 .nav-link:hover,
 .nav-link.active { color: var(--text); background: var(--card); }
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--focus-outline);
+  outline-offset: 2px;
+  box-shadow: var(--focus-ring);
+}
+[role="button"] {
+  cursor: pointer;
+}
 /* === Chart banner (under header) === */
 .chart-banner{
   display:flex;
@@ -215,6 +263,9 @@ html, body {
 .video-card .date{font-size:12px;color:var(--muted)}
 /* Notion blog excerpt */
 .excerpt{font-size:14px;line-height:1.35;color:var(--muted);margin:6px 0 0}
+.pink-link { color: #ffd0db; }
+.pink-link:hover { color: #ffe2e9; }
+.pink-link:focus-visible { color: #ffffff; }
 /* --- BLOG grid (cards with smaller images) --- */
 .cards{
   display:grid;
@@ -340,6 +391,23 @@ html, body {
   max-height: 90vh;
   overflow-y: auto;
   z-index: 1;           /* над бекдропом */
+}
+#stream-modal-root .modal-close {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.45);
+  color: #f2f2f2;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+#stream-modal-root .modal-close:hover {
+  background: rgba(255,255,255,0.12);
 }
 #stream-modal-root .modal-dialog.modal-loading {
   display: flex;
@@ -774,9 +842,8 @@ html, body {
 }
 /* === Visual polish pack (non-breaking enhancements) === */
 :root {
-  --accent: #a78bfa;          /* violet accent */
-  --accent-2: #22d3ee;        /* cyan accent */
-  --ring-shadow: 0 0 0 3px rgba(167,139,250,.35);
+  --accent-2: #22d3ee;
+  --ring-shadow: var(--focus-ring);
 }
 /* smoother micro‑interactions */
 .nav-link, .pill, .btn-platform, .platform-row, .video-card, .card, .release-card {
@@ -835,7 +902,7 @@ button:focus-visible,
 ::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:8px; border:2px solid #0e0e0e; }
 ::-webkit-scrollbar-thumb:hover{ background:#383838; }
 /* === Accent Glow (slightly stronger) === */
-:root { --accent-rgb: 167,139,250; }
+:root { --accent-rgb: 125,211,252; }
 .nav-link:hover,
 .nav-link:focus-visible,
 .pill:hover,
