@@ -1421,6 +1421,11 @@ def security_txt():
     )
     return Response(body, mimetype="text/plain")
 
+@app.route("/googlead3267ff1c364dba.html")
+def google_ads_verification():
+    file_path = os.path.join(app.root_path, "googlead3267ff1c364dba.html")
+    return send_file(file_path, mimetype="text/html")
+
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5050))
