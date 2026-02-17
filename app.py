@@ -1019,7 +1019,7 @@ def index():
     html = render_template(
         'index.html',
         title='UmkA.space',
-        description='На цьому сайті живе Пан UmkA',
+        description='Тут живе Пан UmkA',
         active='home',
         releases=releases,
         need_streams_keys=need_streams_keys,
