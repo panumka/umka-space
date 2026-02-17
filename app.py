@@ -1018,8 +1018,8 @@ def index():
     releases = fetch_stream_releases() if not need_streams_keys else []
     html = render_template(
         'index.html',
-        title='UmkA тут',
-        description='Офіційні релізи UmkA та посилання на Spotify, Apple Music, YouTube Music і інші стримінги.',
+        title='UmkA.space',
+        description='На цьому сайті живе Пан UmkA',
         active='home',
         releases=releases,
         need_streams_keys=need_streams_keys,
@@ -1059,7 +1059,7 @@ def release_page(page_id: str):
             app.logger.warning("[release_page] og meta failed: %r", e)
     html = render_template(
         'index.html',
-        title='UmkA тут',
+        title='UmkA.space',
         description='Слухайте реліз UmkA на улюбленому музичному майданчику.',
         active='home',
         releases=releases,
