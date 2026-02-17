@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20260217-bg4') }}">
   <!-- Favicons -->
   <link rel="icon" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}" sizes="32x32" type="image/png">
   <link rel="icon" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}" sizes="16x16" type="image/png">
@@ -37,9 +37,10 @@
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
   <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
   <meta name="theme-color" content="#111111">
-  <script defer src="{{ url_for('static', filename='app.min.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='app.min.js', v='20260217-bg3') }}"></script>
 </head>
 <body{% if release_id %} data-release-id="{{ release_id }}"{% endif %}>
+  <div id="page-top" aria-hidden="true"></div>
   <a class="skip-link" href="#main-content">Перейти до основного контенту</a>
   <header class="site-header">
     <div class="container header-inner">
@@ -82,6 +83,14 @@
     {% block content %}{% endblock %}
   </main>
 
+  <a
+    id="scroll-top-btn"
+    class="scroll-top-btn"
+    href="#page-top"
+    aria-label="Прокрутити догори"
+    title="Догори"
+  >↑</a>
+
   <footer class="site-footer">
     <div class="container">
       <small>© UmkA, {{ current_year }}</small>
@@ -98,6 +107,40 @@
         }
       })
       .catch(() => {});
+
+    (function () {
+      const btn = document.getElementById("scroll-top-btn");
+      if (!btn) return;
+      const toggle = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        if (y > 100) {
+          btn.classList.add("is-visible");
+        } else {
+          btn.classList.remove("is-visible");
+        }
+      };
+      btn.addEventListener("click", () => {
+        const root = document.scrollingElement || document.documentElement || document.body;
+        try {
+          window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+          if (root && typeof root.scrollTo === "function") {
+            root.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+          }
+        } catch (_) {
+          window.scrollTo(0, 0);
+          if (root) root.scrollTop = 0;
+          if (document.documentElement) document.documentElement.scrollTop = 0;
+          if (document.body) document.body.scrollTop = 0;
+        }
+        if ((window.scrollY || 0) > 0) {
+          location.hash = "page-top";
+        }
+      });
+      window.addEventListener("scroll", toggle, { passive: true });
+      document.addEventListener("scroll", toggle, { passive: true, capture: true });
+      setTimeout(toggle, 120);
+      toggle();
+    })();
   </script>
 </body>
 </html>

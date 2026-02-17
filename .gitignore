@@ -45,3 +45,4 @@ htmlcov/
 # ---------- App caches ----------
 .cache/
 .cache_panamabattle*.json
+.counter.json
