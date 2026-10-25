@@ -13,6 +13,7 @@
          alt="" loading="lazy" decoding="async">
     <span class="invite-video__play" aria-hidden="true">▶</span>
   </button>
+  {% if invite_video.tagline %}<p class="invite-video__text invite-video__text--tagline">{{ invite_video.tagline }}</p>{% endif %}
   {% if invite_video.cta_url %}
   <a class="invite-video__cta" href="{{ invite_video.cta_url }}" target="_blank" rel="noopener">{{ invite_video.cta_text }}</a>
   {% endif %}

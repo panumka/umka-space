@@ -261,6 +261,10 @@ button:focus-visible,
   text-transform:uppercase;
   text-shadow: 0 0 18px rgba(120,200,200,.55);
 }
+.invite-video__text--tagline{
+  margin:18px 0 0;
+  text-transform:none;
+}
 @media (max-width: 640px){
   .invite-video__text{ font-size:22px; }
 }
@@ -304,7 +308,8 @@ button:focus-visible,
   font-size:28px;
   font-weight:800;
   line-height:1.05;
-  text-transform:uppercase;
+  white-space:pre-line;
+  text-align:center;
   text-decoration:none;
   transition: background .2s, transform .2s;
 }

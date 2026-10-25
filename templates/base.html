@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20260217-bg4') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <!-- Favicons -->
   <link rel="icon" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}" sizes="32x32" type="image/png">
   <link rel="icon" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}" sizes="16x16" type="image/png">
@@ -37,7 +37,7 @@
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
   <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
   <meta name="theme-color" content="#111111">
-  <script defer src="{{ url_for('static', filename='app.min.js', v='20260217-bg3') }}"></script>
+  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body{% if release_id %} data-release-id="{{ release_id }}"{% endif %}>
   <div id="page-top" aria-hidden="true"></div>
