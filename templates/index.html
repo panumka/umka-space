@@ -1,6 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="releases">
+{% if invite_video %}
+<section class="invite-video" aria-label="Відеозапрошення">
+  {% if invite_video.title %}<h2 class="invite-video__title">{{ invite_video.title }}</h2>{% endif %}
+  {% if invite_video.text %}<p class="invite-video__text">{{ invite_video.text }}</p>{% endif %}
+  <button type="button"
+          class="invite-video__player{% if invite_video.vertical %} is-vertical{% endif %}"
+          data-yt-id="{{ invite_video.id }}"
+          aria-label="Відтворити відео: {{ invite_video.title or 'відеозапрошення' }}">
+    <img src="https://i.ytimg.com/vi/{{ invite_video.id }}/{{ 'oar2' if invite_video.vertical else 'hqdefault' }}.jpg"
+         onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/{{ invite_video.id }}/hqdefault.jpg'"
+         alt="" loading="lazy" decoding="async">
+    <span class="invite-video__play" aria-hidden="true">▶</span>
+  </button>
+  {% if invite_video.cta_url %}
+  <a class="invite-video__cta" href="{{ invite_video.cta_url }}" target="_blank" rel="noopener">{{ invite_video.cta_text }}</a>
+  {% endif %}
+</section>
+<script>
+  (function () {
+    var btn = document.querySelector(".invite-video__player[data-yt-id]");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var f = document.createElement("iframe");
+      f.src = "https://www.youtube-nocookie.com/embed/" + btn.dataset.ytId + "?autoplay=1&playsinline=1&rel=0";
+      f.title = btn.getAttribute("aria-label") || "YouTube";
+      f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      f.allowFullscreen = true;
+      // YouTube відмовляє у вбудовуванні без Referer (сайт за замовчуванням шле no-referrer)
+      f.referrerPolicy = "strict-origin-when-cross-origin";
+      var wrap = document.createElement("div");
+      wrap.className = btn.className;
+      wrap.appendChild(f);
+      btn.replaceWith(wrap);
+    });
+  })();
+</script>
+{% endif %}
+
+<section class="releases" id="releases">
   <h1 class="sr-only">UmkA тут</h1>
   {% if need_streams_keys %}
     <p class="hint">Додай NOTION_API_KEY та NOTION_STREAMS_DATABASE_ID до .env, щоб підвантажити релізи з Notion.</p>

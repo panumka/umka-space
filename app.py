@@ -160,6 +160,7 @@ def _set_default_headers(resp):
         "font-src 'self' https://fonts.gstatic.com; "
         "script-src 'self' 'unsafe-inline'; "
         "connect-src 'self' https:; "
+        "frame-src https://www.youtube-nocookie.com https://www.youtube.com; "
         "frame-ancestors 'none'"
     )
     resp.headers.setdefault("Content-Security-Policy", csp)
@@ -697,10 +698,11 @@ def fetch_stream_releases(limit: int = 24):
             "date": date,
             "cover": cover,
             "links": links,
+            "_sort": date or r.get("created_time") or "",
         })
 
-    # Notion manual (drag&drop) order: last row = newest → show first
-    items = list(reversed(items))
+    # Newest first: by Date if set, otherwise by when the Notion row was created
+    items.sort(key=lambda it: it.pop("_sort"), reverse=True)
     _set_cached_notion(cache_key, items)
     return items
 
@@ -1006,6 +1008,82 @@ def _client_cache_key():
     terms_key = ",".join(get_terms())
     return f"{ip}|{terms_key}"
 
+# 📣 Банери під шапкою головної (показуються стопкою, у цьому порядку).
+# Поля: title — жирний текст, text — опис, url — куди веде,
+# image — (необов'язково) шлях у static/ або https-посилання на картинку-банер,
+# image_mobile — (необов'язково) окрема картинка для екранів до 640px.
+BANNERS = [
+    # Розкоментуй, коли файли будуть у static/banners/
+    # {
+    #     "title": "PANAMABATTLE",
+    #     "text": "Сезон V · реп-батл онлайн — взяти участь",
+    #     "url": "https://www.panamabattle.com/season-new",
+    #     "image": "banners/panamabattle-970x250.png",
+    #     "image_mobile": "banners/panamabattle-468x60.png",
+    # },
+    {
+        "title": "UmkA",
+        "text": "у чарті українського репу",
+        "url": "https://music.youtube.com/playlist?list=PLqfj-GxxzQq_6jSrlCicVPoDt9uhqtajH&si=fOWdP01o6w-M2xGm",
+    },
+    # {
+    #     "title": "Концерт",
+    #     "text": "15 листопада, Київ — квитки тут",
+    #     "url": "https://example.com/tickets",
+    #     "image": "banners/concert.jpg",  # файл static/banners/concert.jpg
+    # },
+]
+
+# 🎬 Відеозапрошення на головній. url — будь-яке посилання YouTube
+# (watch?v=..., youtu.be/..., shorts/...). Порожній url — блок не показується.
+INVITE_VIDEO = {
+    "url": os.environ.get("UMKA_INVITE_VIDEO_URL", "https://www.youtube.com/shorts/GdUN1YacYcI"),
+    "title": "",
+    "text": "50 000 грн призовий",
+    # Кнопка під відео (порожній cta_url — без кнопки)
+    "cta_text": "Взяти участь на PANAMABATTLE",
+    "cta_url": "https://www.panamabattle.com/season-new",
+}
+
+
+def _youtube_id(url: str) -> str | None:
+    """Extract an 11-char YouTube video id from common URL forms."""
+    if not url:
+        return None
+    try:
+        p = urlparse(url.strip())
+    except Exception:
+        return None
+    host = (p.hostname or "").lower().removeprefix("www.").removeprefix("m.")
+    vid = None
+    if host == "youtu.be":
+        vid = p.path.lstrip("/").split("/")[0]
+    elif host.endswith("youtube.com") or host.endswith("youtube-nocookie.com"):
+        parts = [s for s in p.path.split("/") if s]
+        if parts and parts[0] in ("shorts", "embed", "live") and len(parts) > 1:
+            vid = parts[1]
+        else:
+            from urllib.parse import parse_qs
+            vid = (parse_qs(p.query).get("v") or [None])[0]
+    if vid and len(vid) == 11 and all(c.isalnum() or c in "-_" for c in vid):
+        return vid
+    return None
+
+
+def _invite_video():
+    vid = _youtube_id(INVITE_VIDEO.get("url", ""))
+    if not vid:
+        return None
+    return {
+        "id": vid,
+        "title": INVITE_VIDEO.get("title") or "",
+        "text": INVITE_VIDEO.get("text") or "",
+        "vertical": "/shorts/" in INVITE_VIDEO.get("url", ""),
+        "cta_text": INVITE_VIDEO.get("cta_text") or "",
+        "cta_url": INVITE_VIDEO.get("cta_url") or "",
+    }
+
+
 # 🏠 Головна сторінка — UmkA на музичних майданчиках
 @app.route('/')
 def index():
@@ -1023,6 +1101,8 @@ def index():
         active='home',
         releases=releases,
         need_streams_keys=need_streams_keys,
+        banners=BANNERS,
+        invite_video=_invite_video(),
     )
     _set_cached_page_html(page_cache_key, html)
     return Response(html, mimetype="text/html")
