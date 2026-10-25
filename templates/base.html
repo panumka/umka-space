@@ -4,12 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% set page_title = title or 'UmkA.space' %}
-  {% set page_description = description or 'Тут живе Пан UmkA' %}
+  {% set page_description = description or 'тут живе Пан UmkA' %}
   {% set page_canonical = canonical or (request.url_root.rstrip('/') ~ request.path) %}
   {% set og_title = (og.title if og and og.title else page_title) %}
   {% set og_description = (og.description if og and og.description else page_description) %}
   {% set og_url = (og.url if og and og.url else page_canonical) %}
-  {% set og_image = (og.image if og and og.image else url_for('static', filename='UmkA.png', _external=True)) %}
+  {% set og_default_image = not (og and og.image) %}
+  {% set og_image = (og.image if not og_default_image else url_for('static', filename='og-umka.jpg', _external=True)) %}
   <title>{{ page_title }}</title>
   <meta name="description" content="{{ page_description }}">
   <meta name="robots" content="{{ robots or 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' }}">
@@ -21,6 +22,12 @@
   <meta property="og:description" content="{{ og_description }}">
   <meta property="og:url" content="{{ og_url }}">
   <meta property="og:image" content="{{ og_image }}">
+  {% if og_default_image %}
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="UmkA — тут живе Пан UmkA">
+  {% endif %}
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ og_title }}">
   <meta name="twitter:description" content="{{ og_description }}">

@@ -42,7 +42,7 @@ def _render_home(cache_key: str, **extra) -> Response:
 
 # 🏠 Головна сторінка — UmkA на музичних майданчиках
 def index():
-    return _render_home(f"index:{request.host}", description="Тут живе Пан UmkA")
+    return _render_home(f"index:{request.host}", description="тут живе Пан UmkA")
 
 
 # Shareable release URL with OG meta
