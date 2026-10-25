@@ -1008,7 +1008,7 @@ def _client_cache_key():
     terms_key = ",".join(get_terms())
     return f"{ip}|{terms_key}"
 
-# 📣 Банери під шапкою головної (показуються стопкою, у цьому порядку).
+# 📣 Банери на головній під блоком PANAMABATTLE (показуються стопкою, у цьому порядку).
 # Поля: title — жирний текст, text — опис, url — куди веде,
 # image — (необов'язково) шлях у static/ або https-посилання на картинку-банер,
 # image_mobile — (необов'язково) окрема картинка для екранів до 640px.
@@ -1022,8 +1022,8 @@ BANNERS = [
     #     "image_mobile": "banners/panamabattle-468x60.png",
     # },
     {
-        "title": "UmkA",
-        "text": "у чарті українського репу",
+        "title": "Чарт українського репу",
+        "text": "",
         "url": "https://music.youtube.com/playlist?list=PLqfj-GxxzQq_6jSrlCicVPoDt9uhqtajH&si=fOWdP01o6w-M2xGm",
     },
     # {

@@ -220,9 +220,12 @@ button:focus-visible,
   display:flex;
   flex-direction:column;
   gap:8px;
-  margin-top:12px;
+  margin:0 auto 32px;
 }
-.banner-stack .chart-banner{ margin-top:0; }
+.banner-stack .chart-banner{
+  margin-top:0;
+  width:min(720px, 100%);
+}
 
 .chart-banner--image{
   padding:0;

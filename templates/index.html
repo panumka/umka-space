@@ -38,6 +38,33 @@
 </script>
 {% endif %}
 
+{% if banners %}
+<div class="banner-stack">
+  {% for b in banners %}
+  <a class="chart-banner{% if b.image %} chart-banner--image{% endif %}"
+     href="{{ b.url }}"
+     target="_blank"
+     rel="noopener noreferrer">
+    {% if b.image %}
+      <picture>
+        {% if b.image_mobile %}
+        <source media="(max-width: 640px)"
+                srcset="{{ b.image_mobile if b.image_mobile.startswith('http') else url_for('static', filename=b.image_mobile) }}">
+        {% endif %}
+        <img src="{{ b.image if b.image.startswith('http') else url_for('static', filename=b.image) }}"
+             alt="{{ b.title }}{% if b.text %} — {{ b.text }}{% endif %}"
+             decoding="async">
+      </picture>
+    {% else %}
+      {% if b.title %}<span class="chart-banner__title">{{ b.title }}</span>{% endif %}
+      {% if b.text %}<span class="chart-banner__text">{{ b.text }}</span>{% endif %}
+      <span class="chart-banner__cta">→</span>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
 <section class="releases" id="releases">
   <h1 class="sr-only">UmkA тут</h1>
   {% if need_streams_keys %}
