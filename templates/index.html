@@ -67,7 +67,7 @@
 {% endif %}
 
 <section class="releases" id="releases">
-  <h1 class="sr-only">UmkA тут</h1>
+  <h1 class="sr-only">{% if release %}{{ release.title }} — UmkA{% else %}UmkA — музика та релізи{% endif %}</h1>
   {% if need_streams_keys %}
     <p class="hint">Додай NOTION_API_KEY та NOTION_STREAMS_DATABASE_ID до .env, щоб підвантажити релізи з Notion.</p>
   {% elif releases|length == 0 %}
@@ -78,7 +78,7 @@
       <article class="release-card" role="button" tabindex="0"
                aria-label="Відкрити майданчики для {{ r.title }}"
                data-title="{{ r.title }}"
-               data-date="{{ r.date }}"
+               data-date="{{ r.date or '' }}"
                data-links='{{ r.links | tojson }}'
                data-cover='{{ r.cover | replace("'", "&#39;") | replace("\n", " ") }}'
                data-coverb64='{{ r.cover | b64encode }}'
@@ -102,9 +102,25 @@
       </article>
       {% endfor %}
     </div>
+    {# Справжні посилання на сторінки релізів — для пошуковиків і скрінрідерів (картки відкривають модалку скриптом) #}
+    <nav class="sr-only" aria-label="Сторінки релізів">
+      <ul>
+        {% for r in releases %}<li><a href="{{ url_for('release_page', page_id=r.id) }}">{{ r.title }}</a></li>{% endfor %}
+      </ul>
+    </nav>
   {% endif %}
 </section>
 
 <!-- Контейнер для модалки стрімінгу; JS наповнює його динамічно -->
-<div id="stream-modal-root"></div>
+<div id="stream-modal-root">
+  {% if release and release.links %}
+  {# Поки скрипт не відкрив модалку: назва й майданчики релізу прямо в HTML #}
+  <section class="sr-only" aria-label="Слухати «{{ release.title }}»">
+    <h2>Слухати «{{ release.title }}»</h2>
+    <ul>
+      {% for l in release.links %}<li><a href="{{ l.url }}" rel="noopener">{{ l.label }}</a></li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>
 {% endblock %}

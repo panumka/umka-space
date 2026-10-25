@@ -219,7 +219,7 @@ def release_modal(page_id: str) -> dict:
         '  </div>'
         '</div>'
     )
-    payload = {"ok": True, "title": title, "html": html, "links": links}
+    payload = {"ok": True, "title": title, "html": html, "links": links, "cover": cover_url}
     cache.set_notion(cache_key, payload)
     return payload
 

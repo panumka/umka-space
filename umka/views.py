@@ -19,6 +19,60 @@ def _public_base_url() -> str:
     return request.url_root.rstrip("/")
 
 
+# Месенджери (Telegram тощо) показують og:*, пошук — <title> і description.
+# Прев'ю в месенджерах лишаємо коротким, пошуку даємо більше тексту.
+SITE_TAGLINE = "тут живе Пан UmkA"
+_HOME_TITLE = "UmkA — музика та релізи"
+_HOME_DESCRIPTION = (
+    "тут живе Пан UmkA: релізи на Spotify, Apple Music, YouTube Music, Deezer "
+    "та інших майданчиках, виступи на PANAMABATTLE і блог «UmkA каже»."
+)
+
+
+def _artist_jsonld(base: str) -> dict:
+    return {
+        "@type": "MusicGroup",
+        "@id": f"{base}/#umka",
+        "name": "UmkA",
+        "url": f"{base}/",
+        "image": url_for("static", filename="UmkA.png", _external=True),
+    }
+
+
+def _home_jsonld(base: str, releases: list) -> dict:
+    artist = _artist_jsonld(base)
+    artist["track"] = [
+        {
+            "@type": "MusicRecording",
+            "name": r["title"],
+            "url": url_for("release_page", page_id=r["id"], _external=True),
+        }
+        for r in releases
+    ]
+    return {
+        "@context": "https://schema.org",
+        "@graph": [
+            {"@type": "WebSite", "@id": f"{base}/#site", "name": "UmkA.space", "url": f"{base}/"},
+            artist,
+        ],
+    }
+
+
+def _release_jsonld(base: str, page_id: str, release: dict) -> dict:
+    data = {
+        "@context": "https://schema.org",
+        "@type": "MusicRecording",
+        "name": release["title"],
+        "url": url_for("release_page", page_id=page_id, _external=True),
+        "byArtist": _artist_jsonld(base),
+    }
+    if release.get("date"):
+        data["datePublished"] = release["date"]
+    if release.get("links"):
+        data["sameAs"] = [l["url"] for l in release["links"]]
+    return data
+
+
 def _render_home(cache_key: str, **extra) -> Response:
     """Головна (і сторінка релізу, яка відкриває його модалку поверх головної)."""
     cached_html = cache.get_page_html(cache_key)
@@ -26,11 +80,13 @@ def _render_home(cache_key: str, **extra) -> Response:
         return Response(cached_html, mimetype="text/html")
 
     need_streams_keys = not has_streams_keys()
+    releases = notion_data.fetch_stream_releases() if not need_streams_keys else []
+    base = _public_base_url()
+    extra.setdefault("jsonld", _home_jsonld(base, releases))
     html = render_template(
         "index.html",
-        title="UmkA.space",
         active="home",
-        releases=notion_data.fetch_stream_releases() if not need_streams_keys else [],
+        releases=releases,
         need_streams_keys=need_streams_keys,
         banners=promo.active_banners(),
         invite_video=promo.invite_video(),
@@ -42,33 +98,51 @@ def _render_home(cache_key: str, **extra) -> Response:
 
 # 🏠 Головна сторінка — UmkA на музичних майданчиках
 def index():
-    return _render_home(f"index:{request.host}", description="тут живе Пан UmkA")
+    return _render_home(
+        f"index:{request.host}",
+        title=_HOME_TITLE,
+        description=_HOME_DESCRIPTION,
+        og={"title": "UmkA.space", "description": SITE_TAGLINE},
+    )
 
 
 # Shareable release URL with OG meta
 def release_page(page_id: str):
+    cache_key = f"release:{request.host}:{page_id}"
     og = {
         "title": "UmkA",
+        "description": "Слухай реліз UmkA на улюбленому музичному майданчику.",
         "image": url_for("static", filename="UmkA.png", _external=True),
         "url": request.url,
     }
-    cache_key = f"release:{request.host}:{page_id}"
+    extra = {}
     if NOTION_API_KEY and cache.get_page_html(cache_key) is None:
         try:
-            page = notion_data.client().pages.retrieve(page_id=page_id)
-            props = page.get("properties", {})
-            title = notion_data.release_title(page)
-            og["title"] = og["title"] if title == "Без назви" else title
-            cover_url = notion_data.extract_release_cover(props, page)
-            if cover_url:
-                og["image"] = url_for("proxy_img", b=b64url(cover_url), _external=True)
+            data = notion_data.release_modal(page_id)
+            title = data["title"]
+            # дата — зі списку релізів (там вона вже є і закешована)
+            listed = next((r for r in notion_data.fetch_stream_releases() if r["id"] == page_id), {})
+            release = {"title": title, "links": data["links"], "date": listed.get("date")}
+            platforms = ", ".join(l["label"] for l in data["links"][:4])
+            description = f"«{title}» — реліз UmkA." + (f" Слухай на {platforms} та інших майданчиках." if platforms else "")
+            og.update(title=title, description=description)
+            if data.get("cover"):
+                og["image"] = url_for("proxy_img", b=b64url(data["cover"]), _external=True)
+            extra = {
+                "title": f"{title} — UmkA",
+                "description": description,
+                "release": release,
+                "jsonld": _release_jsonld(_public_base_url(), page_id, release),
+            }
         except Exception as e:
-            current_app.logger.warning("[release_page] og meta failed: %r", e)
+            current_app.logger.warning("[release_page] release meta failed: %r", e)
     return _render_home(
         cache_key,
-        description="Слухайте реліз UmkA на улюбленому музичному майданчику.",
+        title=extra.pop("title", "UmkA"),
+        description=extra.pop("description", og["description"]),
         release_id=page_id,
         og=og,
+        **extra,
     )
 
 
@@ -161,9 +235,6 @@ def robots_txt():
         "Allow: /\n"
         "Disallow: /healthz\n"
         "Disallow: /counter.json\n"
-        "Disallow: /proxy_img\n"
-        "Disallow: /post_json/\n"
-        "Disallow: /release_json/\n"
         f"Sitemap: {_public_base_url()}/sitemap.xml\n"
     )
     return Response(body, mimetype="text/plain")
