@@ -15,11 +15,14 @@ from datetime import timedelta
 
 from flask import Flask
 from flask import url_for as _flask_url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from umka import views
 from umka.config import STATIC_MAX_AGE
 
 app = Flask(__name__)
+# Behind Railway/Cloudflare: trust X-Forwarded-Proto so external URLs are https://
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = timedelta(seconds=STATIC_MAX_AGE)
 
 # Optional: gzip/brotli compression if flask-compress is installed
