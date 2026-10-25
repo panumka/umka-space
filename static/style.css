@@ -244,7 +244,7 @@ button:focus-visible,
   flex-direction:column;
   align-items:center;
   gap:10px;
-  margin:0 auto 32px;
+  margin:12px auto 32px;
   text-align:center;
 }
 .invite-video__title{
@@ -503,8 +503,8 @@ button:focus-visible,
 .video-card{
   display:flex;
   flex-direction:column;
-  border:1.8px solid rgba(255, 255, 255, 0.2);
-  border-radius:12px;
+  border:1px solid rgba(255, 255, 255, 0.1);
+  border-radius:14px;
   background:#0b0b0b;
   text-decoration:none;
   color:var(--text);
@@ -523,8 +523,8 @@ button:focus-visible,
 
 /* Notion blog excerpt */
 .excerpt{font-size:14px;line-height:1.35;color:var(--muted);margin:6px 0 0}
-.pink-link { color: #ffd0db; }
-.pink-link:hover { color: #ffe2e9; }
+.pink-link { color: var(--text); text-decoration: none; }
+.pink-link:hover { color: var(--accent); }
 .pink-link:focus-visible { color: #ffffff; }
 
 /* --- BLOG grid (cards with smaller images) --- */
@@ -536,8 +536,8 @@ button:focus-visible,
 }
 .card{
   background:#0b0b0b;
-  border:1.8px solid rgba(255, 255, 255, 0.2);
-  border-radius:12px;
+  border:1px solid rgba(255, 255, 255, 0.1);
+  border-radius:14px;
   padding:14px;
   text-decoration:none;
   color:var(--text);
@@ -557,8 +557,9 @@ button:focus-visible,
   line-height:1.3;
   margin:0 0 4px;
 }
-.card .date{
-  font-size:12px;
+.card .date,
+.card .meta{
+  font-size:13px;
   color:var(--muted);
   margin:0 0 6px;
 }
@@ -946,7 +947,7 @@ button:focus-visible,
 
 .release-card {
   background: #0b0b0b;
-  border: 1.8px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   overflow: hidden;
   width: 260px;
@@ -959,7 +960,7 @@ button:focus-visible,
 .release-card:hover {
   transform: translateY(-4px);
   background: #121212;
-  border-color: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 .cover-wrap {
@@ -1157,7 +1158,6 @@ button:focus-visible,
 
 /* === Visual polish pack (non-breaking enhancements) === */
 :root {
-  --accent-2: #22d3ee;
   --ring-shadow: var(--focus-ring);
 }
 
@@ -1204,7 +1204,7 @@ button:focus-visible,
 #stream-modal-root .platform-row{ backdrop-filter: blur(2px); }
 
 /* pretty text selection */
-::selection{ background: rgba(167,139,250,.35); color:#fff; }
+::selection{ background: rgba(var(--accent-rgb),.35); color:#fff; }
 
 /* reduced‑motion respect */
 @media (prefers-reduced-motion: reduce){
@@ -1217,7 +1217,7 @@ button:focus-visible,
 ::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:8px; border:2px solid #0e0e0e; }
 ::-webkit-scrollbar-thumb:hover{ background:#383838; }
 /* === Accent Glow (slightly stronger) === */
-:root { --accent-rgb: 125,211,252; }
+:root { --accent-rgb: 212,154,87; }
 
 .nav-link:hover,
 .nav-link:focus-visible,
@@ -1361,3 +1361,16 @@ html, body,
 }
 
 .releases{ scroll-margin-top:16px; }
+
+/* === Typography: Oswald for display accents, system font for body text === */
+:root { --font-display: "Oswald", "Arial Narrow", sans-serif; }
+.invite-video__text,
+.invite-video__cta,
+.chart-banner__title,
+.release-title {
+  font-family: var(--font-display);
+}
+.invite-video__text { font-weight: 600; letter-spacing: 1px; }
+.invite-video__cta { font-weight: 600; letter-spacing: .8px; }
+.chart-banner__title { font-weight: 500; letter-spacing: .6px; text-transform: uppercase; }
+.release-title { font-weight: 500; letter-spacing: .3px; font-size: 1.15rem; }
